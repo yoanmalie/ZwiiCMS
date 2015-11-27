@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>ZwiiCMS, votre site en quelques clics !</title>
+	<meta name="description" content="ZwiiCMS est un logiciel sans base de données qui permet à ses utilisateurs de créer et gérer facilement un site web sans aucune connaissance en programmation.">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="css/normalize.min.css">
+	<link rel="stylesheet" href="css/main.css">
+	<link rel="stylesheet" href="css/grid.css">
+</head>
+<body>
+<div id="cover">
+	<div class="inner">
+		<h1>ZwiiCMS</h1>
+		<p>Créez et gérez facilement un site web sans aucune connaissance en programmation.</p>
+		<div id="get">
+			<a href="https://github.com/remijean/ZwiiCMS/zipball/master/" class="button" onclick="ga('send', 'event', 'Téléchargement');">
+				Télécharger
+			</a><!--
+			--><a href="https://github.com/remijean/ZwiiCMS/" class="button" onclick="ga('send', 'event', 'Accès à GitHub');">
+				Voir sur GitHub
+			</a>
+		</div>
+		<div id="social">
+			<a href="https://facebook.com/ZwiiCMS/" title="Facebook" target="_blank" id="facebook" onclick="ga('send', 'event', 'Facebook');">
+				<img src="images/facebook.png" width="32" height="32">
+			</a>
+			<a href="https://twitter.com/ZwiiCMS/" title="Twitter" target="_blank" id="twitter" onclick="ga('send', 'event', 'Twitter');">
+				<img src="images/twitter.png" width="32" height="32">
+			</a>
+			<a href="mailto:zwiicms@outlook.com" title="Mail" target="_blank" id="mail" onclick="ga('send', 'event', 'Mail');">
+				<img src="images/mail.png" width="32" height="32">
+			</a>
+		</div>
+	</div>
+</div>
+<div id="container">
+	<div class="inner">
+		<div class="row">
+			<div class="col-4">
+				<img src="images/magicwand.png" width="64" height="64">
+				<h2>Ultra simple</h2>
+				<p>Avec ZwiiCMS créer et maintenir votre site web devient un jeu d'enfant !</p>
+			</div>
+			<div class="col-4">
+				<img src="images/x.png" width="64" height="64">
+				<h2>Sans base de données</h2>
+				<p>ZwiiCMS fonctionne sans base de donnée, le contenu de votre site tient dans un seul fichier !</p>
+			</div>
+			<div class="col-4">
+				<img src="images/rocket.png" width="64" height="64">
+				<h2>Super rapide</h2>
+				<p>ZwiiCMS est léger et rapide, vos pages chargerons aussi vite qu'une fusée !</p>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-4">
+				<img src="images/compose.png" width="64" height="64">
+				<h2>Éditeur de texte</h2>
+				<p>L'éditeur de texte de ZwiiCMS vous permettra une mise en page simple et efficace sans aucune connaissance en programmation !</p>
+			</div>
+			<div class="col-4">
+				<img src="images/art.png" width="64" height="64">
+				<h2>Template responsive</h2>
+				<p>ZwiiCMS utilise une structure de template moderne compatible PC, tablette et smartphone en même temps !</p>
+			</div>
+			<div class="col-4">
+				<img src="images/unlocked.png" width="64" height="64">
+				<h2>Open source</h2>
+				<p>ZwiiCMS est complètement gratuit et open source, distribué sous <a href="LICENCE">licence GNU GPL v3</a>.</p>
+			</div>
+		</div>
+	</div>
+	<div id="footer">Développé avec <span class="hearts">&hearts;</span> par <a href="http://remijean.fr/" target="_blank" onclick="ga('send', 'event', 'Portfolio');">Rémi Jean</a> depuis 2008.</div>
+</div>
+<img id="gitter" src="images/chat.png" width="48" height="48">
+
+<script>
+	// Google Analytics
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-40670363-1', 'auto');
+	ga('send', 'pageview');
+	// Gitter
+	((window.gitter = {}).chat = {}).options = {
+		room: 'remijean/ZwiiCMS',
+		activationElement: '#gitter'
+	};
+</script>
+<script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
+</body>
+</html>
