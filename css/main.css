@@ -147,12 +147,3 @@ img:hover {
 #footer a:hover {
 	text-decoration: none;
 }
-
-/* Gitter */
-#gitter {
-	cursor: pointer;
-	position: fixed;
-	bottom: 20px;
-	right: 20px;
-	z-index: 10;
-}
