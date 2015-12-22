@@ -65,7 +65,7 @@ img:hover {
 #cover p {
 	max-width: 700px;
 	font-weight: 300;
-	font-size: 1.2em;
+	font-size: 1.1em;
 }
 #cover #get a {
 	background-color: rgba(255, 255, 255, .2);
@@ -91,13 +91,13 @@ img:hover {
 }
 #cover #social a {
 	display: inline-block;
-	margin: 20px 10px;
+	margin: 10px 10px;
 }
 #cover #go {
 	position: absolute;
 	bottom: 20px;
 	left: 50%;
-	margin-left: -24px;
+	margin-left: -16px;
 	opacity: .4;
 }
 @media (min-width: 768px) {
@@ -111,6 +111,9 @@ img:hover {
 		margin: 5px;
 		display: inline-block;
 		padding: 14px 16px;
+	}
+	#cover #social a {
+		margin: 20px 10px;
 	}
 }
 
