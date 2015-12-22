@@ -95,7 +95,7 @@ img:hover {
 }
 #cover #go {
 	position: absolute;
-	bottom: 20px;
+	bottom: 5px;
 	left: 50%;
 	margin-left: -16px;
 	opacity: .4;
@@ -114,6 +114,9 @@ img:hover {
 	}
 	#cover #social a {
 		margin: 20px 10px;
+	}
+	#cover #go {
+		bottom: 20px;
 	}
 }
 
