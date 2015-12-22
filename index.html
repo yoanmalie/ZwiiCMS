@@ -18,7 +18,7 @@
 			<a href="http://forum.zwiicms.com/" onclick="ga('send', 'event', 'Forum');">
 				Support
 			</a><!--
-			--><a href="https://github.com/remijean/ZwiiCMS/zipball/master/" onclick="ga('send', 'event', 'Téléchargement');">
+			--><a href="https://github.com/remijean/ZwiiCMS/zipball/master/" class="download" onclick="ga('send', 'event', 'Téléchargement');">
 				Télécharger
 			</a><!--
 			--><a href="https://www.pingfiles.com/site-web-gratuit.html" target="_blank" onclick="ga('send', 'event', 'PingFiles');">
@@ -39,10 +39,14 @@
 				<img src="images/mail.png" alt="Mail" width="32" height="32">
 			</a>
 		</div>
+		<a href="#why" id="go">
+			<img src="images/arrow.png" alt="Pourquoi choisir ZwiiCMS ?" width="48" height="48">
+		</a>
 	</div>
 </div>
 <div id="container">
 	<div class="inner">
+		<h1 id="why">Pourquoi choisir ZwiiCMS ?</h1>
 		<div class="row">
 			<div class="col-4">
 				<img src="images/magicwand.png" alt="Ultra simple" width="64" height="64">
@@ -97,7 +101,6 @@
 	</div>
 	<div id="footer">Développé avec <span class="hearts">&hearts;</span> par <a href="http://remijean.fr/" target="_blank" onclick="ga('send', 'event', 'Portfolio');">Rémi Jean</a> depuis 2008.</div>
 </div>
-
 <script>
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -106,5 +109,7 @@
 	ga('create', 'UA-40670363-1', 'auto');
 	ga('send', 'pageview');
 </script>
+<script src="js/jquery.min.js"></script>
+<script src="js/script.js"></script>
 </body>
 </html>
