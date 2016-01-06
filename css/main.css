@@ -86,8 +86,9 @@ input[type=image]:hover {
 	font-weight: 300;
 	color: #FFF;
 	text-shadow: 2px 2px 3px rgba(0, 0, 0, .8);
-	margin: 20px 0 10px;
+	margin: 10px 5px 15px;
 	display: block;
+	font-size: .9em;
 }
 #cover #hosting a:hover {
 	text-decoration: underline;
@@ -104,7 +105,7 @@ input[type=image]:hover {
 }
 #cover #social a {
 	display: inline-block;
-	margin: 10px 10px;
+	margin: 0 10px;
 }
 #cover #go {
 	position: absolute;
@@ -125,8 +126,11 @@ input[type=image]:hover {
 		display: inline-block;
 		padding: 14px 16px;
 	}
+	#cover #hosting a {
+		margin: 20px 0;
+	}
 	#cover #social a {
-		margin: 20px 10px;
+		margin: 0 10px;
 	}
 	#cover #go {
 		bottom: 20px;
