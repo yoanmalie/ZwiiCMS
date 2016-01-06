@@ -96,6 +96,12 @@ input[type=image]:hover {
 	color: rgba(255, 255, 255, .5);
 	font-size: 10px;
 }
+#cover #get a.download {
+	background-color: rgba(46, 204, 113, .6);
+}
+#cover #get a.download:hover {
+	background-color: rgba(46, 204, 113, .8);
+}
 #cover #social a {
 	display: inline-block;
 	margin: 10px 10px;
