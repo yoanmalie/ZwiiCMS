@@ -216,12 +216,16 @@ class newsMod extends common
 			// Crée l'affichage des news en fonction de la pagination
 			for($i = $pagination['first']; $i < $pagination['last']; $i++) {
 				self::$content .=
-					template::title($this->getData([$this->getUrl(0), $news[$i], 'title'])).
-					template::subTitle(date('d/m/Y - H:i', $this->getData([$this->getUrl(0), $news[$i], 'date']))).
-					$this->getData([$this->getUrl(0), $news[$i], 'content']).
-					// ClearBoth au cas ou l'utilisateur ajoute une image en float dans la news
-					template::div([
-						'class' => 'clearBoth'
+					template::block([
+						'col' => 0,
+						'title' => $this->getData([$this->getUrl(0), $news[$i], 'title']),
+						'text' =>
+							template::smallTitle(date('d/m/Y - H:i', $this->getData([$this->getUrl(0), $news[$i], 'date']))).
+							$this->getData([$this->getUrl(0), $news[$i], 'content']).
+							// ClearBoth au cas ou l'utilisateur ajoute une image en float dans la news
+							template::div([
+								'class' => 'clearBoth'
+							])
 					]);
 			}
 			// Ajoute la liste des pages en dessous des news

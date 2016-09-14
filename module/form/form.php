@@ -311,21 +311,25 @@ class formAdm extends common
 						}
 					'),
 				'Configuration' =>
-					template::openRow().
-					template::text('mail', [
-						'label' => 'Adresse mail pour recevoir les données saisies à chaque soumission du formulaire',
-						'value' => $this->getData([$this->getUrl(0), 'config', 'mail'])
-					]).
-					template::newRow().
-					template::text('button', [
-						'label' => 'Texte du bouton de soumission',
-						'value' => $this->getData([$this->getUrl(0), 'config', 'button'])
-					]).
-					template::newRow().
-					template::checkbox('capcha', true, 'Ajouter un capcha à remplir pour soumettre le formulaire', [
-						'checked' => $this->getData([$this->getUrl(0), 'config', 'capcha'])
-					]).
-					template::closeRow(),
+					template::block([
+						'col' => 0,
+						'text' =>
+							template::openRow().
+							template::text('mail', [
+								'label' => 'Adresse mail pour recevoir les données saisies à chaque soumission du formulaire',
+								'value' => $this->getData([$this->getUrl(0), 'config', 'mail'])
+							]).
+							template::newRow().
+							template::text('button', [
+								'label' => 'Texte du bouton de soumission',
+								'value' => $this->getData([$this->getUrl(0), 'config', 'button'])
+							]).
+							template::newRow().
+							template::checkbox('capcha', true, 'Ajouter un capcha à remplir pour soumettre le formulaire', [
+								'checked' => $this->getData([$this->getUrl(0), 'config', 'capcha'])
+							]).
+							template::closeRow()
+				]),
 				'Données enregistrées' =>
 					(isset($data) ? $data : template::subTitle('Aucune donnée...'))
 			]).
@@ -448,25 +452,32 @@ class formMod extends common
 		}
 		// Génère les inputs
 		if($this->getData([$this->getUrl(0), 'input'])) {
+			// Inputs
+			$html = '';
 			foreach($this->getData([$this->getUrl(0), 'input']) as $index => $input) {
-				self::$content .= $this->generateInput($index, $input);
+				$html .= $this->generateInput($index, $input);
 			}
-			$capcha = '';
+			// Capcha et validation
 			if($this->getData([$this->getUrl(0), 'config', 'capcha'])) {
-				$capcha = template::capcha('capcha', [
-					'col' => 3
-				]).
-				template::newRow();
+				$html .=
+					template::openRow().
+					template::capcha('capcha', [
+						'col' => 3
+					]).
+					template::closeRow();
 			}
-			// Ajout du bouton de validation
-			self::$content .=
-				template::openRow().
-				$capcha.
-				template::submit('submit', [
-					'value' => $this->getData([$this->getUrl(0), 'config', 'button']) ? $this->getData([$this->getUrl(0), 'config', 'button']) : 'Enregistrer',
-					'col' => 2
-				]).
-				template::closeRow();
+			// Assemble les éléments
+			self::$content = template::block([
+				'col' => 0,
+				'text' =>
+					$html.
+					template::openRow().
+					template::submit('submit', [
+						'value' => $this->getData([$this->getUrl(0), 'config', 'button']) ? $this->getData([$this->getUrl(0), 'config', 'button']) : 'Enregistrer',
+						'col' => 2
+					]).
+					template::closeRow()
+			]);
 		}
 		// Contenu de la page
 		self::$content =

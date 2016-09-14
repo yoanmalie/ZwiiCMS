@@ -126,16 +126,24 @@ class guestbookMod extends common
 				if($mail = $this->getData([$this->getUrl(0), $commentaires[$i], 'mail'])) {
 					$name = template::a(
 						'mailto:' . $mail,
-						template::title($this->getData([$this->getUrl(0), $commentaires[$i], 'name']))
+						$this->getData([$this->getUrl(0), $commentaires[$i], 'name'])
 					);
 				}
 				else {
-					$name = template::title($this->getData([$this->getUrl(0), $commentaires[$i], 'name']));
+					$name = $this->getData([$this->getUrl(0), $commentaires[$i], 'name']);
 				}
 				self::$content .=
-					$name.
-					template::subTitle(date('d/m/Y - H:i', $this->getData([$this->getUrl(0), $commentaires[$i], 'date']))).
-					$this->getData([$this->getUrl(0), $commentaires[$i], 'comment']);
+					template::block([
+						'col' => 0,
+						'title' => $name,
+						'text' =>
+							template::smallTitle(date('d/m/Y - H:i', $this->getData([$this->getUrl(0), $commentaires[$i], 'date']))).
+							$this->getData([$this->getUrl(0), $commentaires[$i], 'comment']).
+							// ClearBoth au cas ou l'utilisateur ajoute une image en float dans le commentaire
+							template::div([
+								'class' => 'clearBoth'
+							])
+					]);
 			}
 			// Ajoute la liste des pages en dessous des commentaires
 			self::$content .= $pagination['page'];
@@ -144,32 +152,35 @@ class guestbookMod extends common
 		self::$content =
 			(self::$content ? self::$content : template::subTitle('Aucun commentaire...')).
 			template::openForm().
-			template::openRow().
-			template::text('name', [
-				'label' => 'Nom',
-				'required' => true,
-				'col' => 6
+			template::block([
+				'col' => 0,
+				'title' => 'Ajouter un commentaire',
+				'text' =>
+					template::openRow().
+					template::text('name', [
+						'label' => 'Nom',
+						'required' => true,
+						'col' => 6
+					]).
+					template::text('mail', [
+						'label' => 'Adresse mail (facultatif)',
+						'col' => 6
+					]).
+					template::newRow().
+					template::textarea('comment', [
+						'label' => 'Commentaire'
+					]).
+					template::newRow().
+					template::capcha('capcha', [
+						'col' => 3
+					]).
+					template::submit('submit', [
+						'value' => 'Ajouter',
+						'col' => 2,
+						'offset' => 7,
+					]).
+					template::closeRow()
 			]).
-			template::newRow().
-			template::text('mail', [
-				'label' => 'Adresse mail (facultatif)',
-				'col' => 6
-			]).
-			template::newRow().
-			template::textarea('comment', [
-				'label' => 'Commentaire',
-				'col' => 8
-			]).
-			template::newRow().
-			template::capcha('capcha', [
-				'col' => 3
-			]).
-			template::newRow().
-			template::submit('submit', [
-				'value' => 'Ajouter',
-				'col' => 2
-			]).
-			template::closeRow().
 			template::closeForm();
 	}
 }

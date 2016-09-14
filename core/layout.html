@@ -10,7 +10,7 @@
 	<link rel="stylesheet" href="<?php echo helper::baseUrl(false); ?>core/theme.css">
 	<link rel="stylesheet" href="<?php echo helper::baseUrl(false); ?>core/cache/<?php echo self::$cssVersion; ?>.css">
 </head>
-<body class="<?php echo $this->showThemeClass(); ?>" style="background-image: url('<?php echo helper::baseUrl(false) . $this->getData(['config', 'theme', 'image', 'background']); ?>');">
+<body class="<?php echo $this->showThemeClass(); ?>" style="background-image: url('<?php echo helper::baseUrl(false) . $this->getData(['theme', 'image', 'background']); ?>');">
 <?php echo $this->showCommonScript(); ?>
 <?php echo $this->showPanel(); ?>
 <?php echo $this->showNotification(); ?>

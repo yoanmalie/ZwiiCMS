@@ -102,6 +102,7 @@ class common
 		'rename',
 		'save',
 		'sitemap',
+		'theme',
 		'upload'
 	];
 
@@ -146,38 +147,6 @@ class common
 				'pinterest' => '',
 				'twitter' => 'ZwiiCMS',
 				'youtube' => ''
-			],
-			'theme' => [
-				'class' => [
-					'backgroundImageRepeat' => 'themeBackgroundImageRepeatNo',
-					'backgroundImagePosition' => 'themeBackgroundImagePositionCover',
-					'backgroundImageAttachment' => 'themeBackgroundImageAttachmentScroll',
-					'headerHeight' => 'themeHeaderHeightMedium',
-					'headerMargin' => false,
-					'headerPosition' => 'themeHeaderPositionSite',
-					'headerTextAlign' => 'themeHeaderTextAlignCenter',
-					'menuHeight' => 'themeMenuHeightMedium',
-					'menuMargin' => false,
-					'menuPosition' => 'themeMenuPositionSite',
-					'menuTextAlign' => 'themeMenuTextAlignLeft',
-					'siteRadius' => false,
-					'siteShadow' => false,
-					'siteWidth' => 'themeSiteWidthLarge'
-				],
-				'color' => [
-					'background' => 'E8E8E8',
-					'element' => '477BB8',
-					'header' => 'FFFFFF',
-					'menu' => '477BB8'
-				],
-				'font' => [
-					'text' => 'Lato',
-					'title' => 'Oswald'
-				],
-				'image' => [
-					'background' => '',
-					'header' => ''
-				]
 			],
 			'title' => 'ZwiiCMS, votre site en quelques clics !'
 		],
@@ -265,6 +234,38 @@ class common
 				'parent' => '',
 				'position' => 7,
 				'title' => 'Site de ZwiiCMS'
+			]
+		],
+		'theme' => [
+			'class' => [
+				'backgroundImageRepeat' => 'themeBackgroundImageRepeatNo',
+				'backgroundImagePosition' => 'themeBackgroundImagePositionCover',
+				'backgroundImageAttachment' => 'themeBackgroundImageAttachmentScroll',
+				'headerHeight' => 'themeHeaderHeightMedium',
+				'headerMargin' => false,
+				'headerPosition' => 'themeHeaderPositionSite',
+				'headerTextAlign' => 'themeHeaderTextAlignCenter',
+				'menuHeight' => 'themeMenuHeightMedium',
+				'menuMargin' => false,
+				'menuPosition' => 'themeMenuPositionSite',
+				'menuTextAlign' => 'themeMenuTextAlignLeft',
+				'siteRadius' => false,
+				'siteShadow' => false,
+				'siteWidth' => 'themeSiteWidthLarge'
+			],
+			'color' => [
+				'background' => 'E8E8E8',
+				'element' => '477BB8',
+				'header' => 'FFFFFF',
+				'menu' => '477BB8'
+			],
+			'font' => [
+				'text' => 'Lato',
+				'title' => 'Oswald'
+			],
+			'image' => [
+				'background' => '',
+				'header' => ''
 			]
 		],
 		'contact' => [
@@ -678,66 +679,6 @@ class core extends common
 	{
 		// Hérite de la méthode __construct() parente
 		parent::__construct();
-		// Scripts de mise à jour
-		// Vers 7.6.0 - 7.6.2
-		if(!$this->getData(['config', 'dataVersion'])) {
-			// Déplace les classes vers config > theme > class
-			foreach($this->getData('theme') as $key => $class) {
-				if(!in_array($key, ['siteMargin', 'backgroundColor', 'elementColor', 'headerColor', 'menuColor'])) {
-					$this->setData(['config', 'theme', 'class', $key, $class]);
-				}
-			}
-			// Ajoute les réseaux sociaux
-			$this->setData(['config', 'social', [
-				'facebook' => 'ZwiiCMS',
-				'googleplus' => '',
-				'instagram' => '',
-				'pinterest' => '',
-				'twitter' => 'ZwiiCMS',
-				'youtube' => ''
-			]]);
-			// Ajoute le favicon
-			$this->setData(['config', 'favicon', 'data/upload/favicon.ico']);
-			// Ajoute les couleurs par défaut
-			$this->setData(['config', 'theme', 'color', [
-				'background' => 'E8E8E8',
-				'element' => '477BB8',
-				'header' => 'FFFFFF',
-				'menu' => '477BB8'
-			]]);
-			// Ajoute les polices de caractères par défaut
-			$this->setData(['config', 'theme', 'font', [
-				'text' => 'Lato',
-				'title' => 'Oswald'
-			]]);
-			// Supprime theme
-			$this->removeData('theme');
-			// Renomme pages en page puis supprime pages
-			$this->setData(['page', $this->getData('pages')]);
-			$this->removeData('pages');
-			// Renomme inputs en input puis supprime inputs
-			foreach($this->getData() as $key => $subKeys) {
-				if(!in_array($key, ['config', 'page']) AND $inputs = $this->getData([$key, 'inputs'])) {
-					$this->setData([$key, 'input', $inputs]);
-					$this->removeData([$key, 'inputs']);
-				}
-			}
-			// Met à jour la version des données
-			$this->setData(['config', 'dataVersion', self::$version]);
-			// Enregistre les modifs
-			$this->saveData(true);
-		}
-		// Vers 7.7.1
-		if($this->getData(['config', 'dataVersion']) < '7.7.1') {
-			// Ajoute modulePosition aux pages
-			foreach($this->getData('page') as $pageId => $page) {
-				$this->setData(['page', $pageId, 'modulePosition', 'top']);
-			}
-			// Met à jour la version des données
-			$this->setData(['config', 'dataVersion', self::$version]);
-			// Enregistre les modifs
-			$this->saveData(true);
-		}
 		// Supprime les fichiers temporaires trop vieux
 		$it = new DirectoryIterator('core/tmp/');
 		foreach($it as $file) {
@@ -746,14 +687,14 @@ class core extends common
 			}
 		}
 		// Définie la version du CSS
-		self::$cssVersion = md5(json_encode(array_merge($this->getData(['config', 'theme', 'color']), $this->getData(['config', 'theme', 'font']))));
+		self::$cssVersion = md5(json_encode(array_merge($this->getData(['theme', 'color']), $this->getData(['theme', 'font']))));
 		// Génère le cache CSS si besoin
 		if(!file_exists('core/cache/' . self::$cssVersion . '.css')) {
 			// Police de caractères
 			$css = '
-				@import url("https://fonts.googleapis.com/css?family=' . $this->getData(['config', 'theme', 'font', 'text']) . '|' . $this->getData(['config', 'theme', 'font', 'title']) . '");
+				@import url("https://fonts.googleapis.com/css?family=' . $this->getData(['theme', 'font', 'text']) . '|' . $this->getData(['theme', 'font', 'title']) . '");
 				body {
-					font-family: "' . self::$fonts[$this->getData(['config', 'theme', 'font', 'text'])] . '", sans-serif;
+					font-family: "' . self::$fonts[$this->getData(['theme', 'font', 'text'])] . '", sans-serif;
 				}
 				h1,
 				h2,
@@ -762,11 +703,11 @@ class core extends common
 				h5,
 				h6,
 				.tabTitles {
-					font-family: "' . self::$fonts[$this->getData(['config', 'theme', 'font', 'title'])] . '", sans-serif;
+					font-family: "' . self::$fonts[$this->getData(['theme', 'font', 'title'])] . '", sans-serif;
 				}
 			';
 			// Couleur du header
-			if($rgb = helper::hexToRgb($this->getData(['config', 'theme', 'color', 'header']))) {
+			if($rgb = helper::hexToRgb($this->getData(['theme', 'color', 'header']))) {
 				$color = $rgb['r'] . ',' . $rgb['g'] . ',' . $rgb['b'];
 				$textVariant = (.213 * $rgb['r'] + .715 * $rgb['g'] + .072 * $rgb['b'] > 127.5) ? 'inherit' : '#FFF';
 				$css .= '
@@ -780,12 +721,12 @@ class core extends common
 				';
 			}
 			// Couleurs du menu
-			if($rgb = helper::hexToRgb($this->getData(['config', 'theme', 'color', 'menu']))) {
+			if($rgb = helper::hexToRgb($this->getData(['theme', 'color', 'menu']))) {
 				$color = $rgb['r'] . ',' . $rgb['g'] . ',' . $rgb['b'];
 				$colorDark = ($rgb['r'] - 20) . ',' . ($rgb['g'] - 20) . ',' . ($rgb['b'] - 20);
 				$colorVeryDark = ($rgb['r'] - 25) . ',' . ($rgb['g'] - 25) . ',' . ($rgb['b'] - 25);
 				$textVariant = (.213 * $rgb['r'] + .715 * $rgb['g'] + .072 * $rgb['b'] > 127.5) ? 'inherit' : '#FFF';
-				if($this->getData(['config', 'theme', 'class', 'menuPosition']) === 'themeMenuPositionHeader') {
+				if($this->getData(['theme', 'class', 'menuPosition']) === 'themeMenuPositionHeader') {
 					$color = 'background-color: rgba(' . $color . ', .7);';
 					$colorDark = 'background-color: rgba(' . $colorDark . ', .7);';
 					$colorVeryDark = 'background-color: rgba(' . $colorVeryDark . ', .7);';
@@ -825,7 +766,7 @@ class core extends common
 				';
 			}
 			// Couleurs des éléments
-			if($rgb = helper::hexToRgb($this->getData(['config', 'theme', 'color', 'element']))) {
+			if($rgb = helper::hexToRgb($this->getData(['theme', 'color', 'element']))) {
 				$color = $rgb['r'] . ',' . $rgb['g'] . ',' . $rgb['b'];
 				$colorDark = ($rgb['r'] - 20) . ',' . ($rgb['g'] - 20) . ',' . ($rgb['b'] - 20);
 				$colorVeryDark = ($rgb['r'] - 25) . ',' . ($rgb['g'] - 25) . ',' . ($rgb['b'] - 25);
@@ -879,7 +820,7 @@ class core extends common
 				';
 			}
 			// Couleur de fond
-			if($rgb = helper::hexToRgb($this->getData(['config', 'theme', 'color', 'background']))) {
+			if($rgb = helper::hexToRgb($this->getData(['theme', 'color', 'background']))) {
 				$color = $rgb['r'] . ',' . $rgb['g'] . ',' . $rgb['b'];
 				$css .= '
 					/* Couleur normale */
@@ -1106,7 +1047,7 @@ class core extends common
 	 */
 	public function showHeaderImage()
 	{
-		if($headerImage = $this->getData(['config', 'theme', 'image', 'header'])) {
+		if($headerImage = $this->getData(['theme', 'image', 'header'])) {
 			return '<div class="image"><img src="' . helper::baseUrl(false) . $headerImage . '" title="' . $this->getData(['config', 'title']) . '" alt="' . $this->getData(['config', 'title']) . '"></div>';
 		}
 	}
@@ -1212,6 +1153,7 @@ class core extends common
 			$right = '<li><a href="' . helper::baseUrl() . 'create" title="' . helper::translate('Créer une page') . '">' . template::ico('plus') . '</a></li>';
 			$right .= '<li><a href="' . helper::baseUrl() . 'mode/' . $this->getUrl(null, false) . '"' . ($this->getMode() ? ' class="edit"' : '') . ' title="' . helper::translate('Activer/Désactiver le mode édition') . '">' . template::ico('pencil') . '</a></li>';
 			$right .= '<li><a href="' . helper::baseUrl() . 'manager" title="' . helper::translate('Gérer les fichiers') . '">' . template::ico('folder') . '</a></li>';
+			$right .= '<li><a href="' . helper::baseUrl() . 'theme" title="' . helper::translate('Personnaliser le thème') . '">' . template::ico('palette') . '</a></li>';
 			$right .= '<li><a href="' . helper::baseUrl() . 'config" title="' . helper::translate('Configurer le site') . '">' . template::ico('gear') . '</a></li>';
 			$right .= '<li><a href="' . helper::baseUrl() . 'logout" data-remodal-target="modal" title="' . helper::translate('Se déconnecter') . '">' . template::ico('logout') . '</a></li>';
 			// Retourne le panneau
@@ -1418,7 +1360,7 @@ class core extends common
 	{
 		// Liste des classes
 		$class = [];
-		foreach($this->getData(['config', 'theme', 'class']) as $key => $value) {
+		foreach($this->getData(['theme', 'class']) as $key => $value) {
 			// Pour les booleans
 			if($value === true) {
 				$class[] = 'theme' . ucfirst($key);
@@ -1429,7 +1371,7 @@ class core extends common
 			}
 		}
 		// Cas spécifique pour l'image de la bannière
-		if($this->getData(['config', 'theme', 'image', 'header'])) {
+		if($this->getData(['theme', 'image', 'header'])) {
 			$class[] = 'themeHeaderImage';
 		}
 		return implode($class, ' ');
@@ -1527,38 +1469,6 @@ class core extends common
 						'twitter' => $this->getPost('twitter', helper::STRING),
 						'youtube' => $this->getPost('youtube', helper::STRING)
 					],
-					'theme' => [
-						'class' => [
-							'backgroundImageRepeat' => $this->getPost('backgroundImageRepeat', helper::STRING),
-							'backgroundImagePosition' => $this->getPost('backgroundImagePosition', helper::STRING),
-							'backgroundImageAttachment' => $this->getPost('backgroundImageAttachment', helper::STRING),
-							'headerHeight' => $this->getPost('headerHeight', helper::STRING),
-							'headerMargin' => $this->getPost('headerMargin', helper::BOOLEAN),
-							'headerPosition' => $this->getPost('headerPosition', helper::STRING),
-							'headerTextAlign' => $this->getPost('headerTextAlign', helper::STRING),
-							'menuHeight' => $this->getPost('menuHeight', helper::STRING),
-							'menuMargin' => $this->getPost('menuMargin', helper::BOOLEAN),
-							'menuPosition' => $this->getPost('menuPosition', helper::STRING),
-							'menuTextAlign' => $this->getPost('menuTextAlign', helper::STRING),
-							'siteRadius' => $this->getPost('siteRadius', helper::BOOLEAN),
-							'siteShadow' => $this->getPost('siteShadow', helper::BOOLEAN),
-							'siteWidth' => $this->getPost('siteWidth', helper::STRING)
-						],
-						'color' => [
-							'background' => $this->getPost('backgroundColor', helper::STRING),
-							'element' => $this->getPost('elementColor', helper::STRING),
-							'header' => $this->getPost('headerColor', helper::STRING),
-							'menu' => $this->getPost('menuColor', helper::STRING)
-						],
-						'font' => [
-							'text' => $this->getPost('textFont', helper::STRING),
-							'title' => $this->getPost('titleFont', helper::STRING)
-						],
-						'image' => [
-							'background' => $this->getPost('backgroundImage', helper::URL),
-							'header' => $this->getPost('headerImage', helper::URL)
-						]
-					],
 					'title' => $this->getPost('title', helper::STRING)
 				]
 			]);
@@ -1600,581 +1510,182 @@ class core extends common
 			template::tabs([
 				'Configuration générale' =>
 					template::openRow().
-					template::text('title', [
-						'label' => 'Titre du site',
-						'required' => true,
-						'value' => $this->getData(['config', 'title'])
+					template::block([
+						'col' => 6,
+						'title' => 'Informations principales',
+						'text' =>
+							template::openRow().
+							template::text('title', [
+								'label' => 'Titre du site',
+								'required' => true,
+								'value' => $this->getData(['config', 'title'])
+							]).
+							template::newRow().
+							template::textarea('description', [
+								'label' => 'Description du site',
+								'required' => true,
+								'value' => $this->getData(['config', 'description'])
+							]).
+							template::newRow().
+							template::select('index', helper::arrayCollumn($this->getData('page'), 'title', 'SORT_ASC', true), [
+								'label' => 'Page d\'accueil',
+								'required' => true,
+								'selected' => $this->getData(['config', 'index']),
+								'col' => 6
+							]).
+							template::select('language', helper::listLanguages('Ne pas traduire'), [
+								'label' => 'Traduire le site',
+								'selected' => $this->getData(['config', 'language']),
+								'col' => 6
+							]).
+							template::closeRow()
 					]).
-					template::newRow().
-					template::textarea('description', [
-						'label' => 'Description du site',
-						'required' => true,
-						'value' => $this->getData(['config', 'description'])
-					]).
-					template::newRow().
-					template::password('newPassword', [
-						'label' => 'Nouveau mot de passe',
-						'autocomplete' => 'off',
-						'col' => 6
-					]).
-					template::password('confirmPassword', [
-						'label' => 'Confirmation du mot de passe',
-						'autocomplete' => 'off',
-						'col' => 6
-					]).
-					template::newRow().
-					template::select('index', helper::arrayCollumn($this->getData('page'), 'title', 'SORT_ASC', true), [
-						'label' => 'Page d\'accueil',
-						'required' => true,
-						'selected' => $this->getData(['config', 'index'])
-					]).
-					template::newRow().
-					template::select('language', helper::listLanguages('Ne pas traduire'), [
-						'label' => 'Traduire le site',
-						'selected' => $this->getData(['config', 'language'])
+					template::block([
+						'col' => 6,
+						'title' => 'Sécurité',
+						'text' =>
+							template::openRow().
+							template::password('newPassword', [
+								'label' => 'Nouveau mot de passe',
+								'autocomplete' => 'off'
+							]).
+							template::newRow().
+							template::password('confirmPassword', [
+								'label' => 'Confirmation du mot de passe',
+								'autocomplete' => 'off'
+							]).
+							template::closeRow()
 					]).
 					template::closeRow(),
 				'Configuration avancée' =>
-					template::subTitle('Site').
 					template::openRow().
-					template::select('favicon', helper::listUploads('Aucune image', ['ico'], null, 16, 16), [
-						'label' => 'Favicon',
-						'help' => 'Seule une image de format .ico en 16x16 du gestionnaire de fichiers est acceptée. Attention si le favicon ne change pas, supprimez le cache de votre navigateur !',
-						'selected' => $this->getData(['config', 'favicon'])
-					]).
-					template::newRow().
-					template::textarea('footer', [
-						'label' => 'Texte du bas de page',
-						'value' => $this->getData(['config', 'footer'])
-					]).
-					template::closeRow().
-					template::subTitle('Statistiques').
-					template::openRow().
-					template::text('analytics', [
-						'label' => 'Google Analytics',
-						'value' => $this->getData(['config', 'analytics']),
-						'help' => 'Saisissez l\'ID de suivi de votre propriété Google Analytics.',
-						'placeholder' => 'UA-XXXXXXXX-X',
-					]).
-					template::closeRow().
-					template::subTitle('Réseaux sociaux').
-					template::openRow().
-					template::text('facebook', [
-						'label' => 'Facebook',
-						'value' => $this->getData(['config', 'social', 'facebook']),
-						'help' => 'Saisissez votre ID Facebook, il correspond à la partie suivante de l\'URL de Facebook : https://www.facebook.com/CETTE PARTIE',
-						'col' => 2
-					]).
-					template::text('googleplus', [
-						'label' => 'Google+',
-						'value' => $this->getData(['config', 'social', 'googleplus']),
-						'help' => 'Saisissez votre ID Google+, il correspond à la partie suivante de l\'URL de Google+ : https://plus.google.com/CETTE PARTIE',
-						'col' => 2
-					]).
-					template::text('instagram', [
-						'label' => 'Instagram',
-						'value' => $this->getData(['config', 'social', 'instagram']),
-						'help' => 'Saisissez votre ID Instagram, il correspond à la partie suivante de l\'URL de Instagram : https://www.instagram.com/CETTE PARTIE',
-						'col' => 2
-					]).
-					template::text('pinterest', [
-						'label' => 'Pinterest',
-						'value' => $this->getData(['config', 'social', 'pinterest']),
-						'help' => 'Saisissez votre ID Pinterest, il correspond à la partie suivante de l\'URL de Pinterest : https://pinterest.com/CETTE PARTIE',
-						'col' => 2
-					]).
-					template::text('twitter', [
-						'label' => 'Twitter',
-						'value' => $this->getData(['config', 'social', 'twitter']),
-						'help' => 'Saisissez votre ID Twitter, il correspond à la partie suivante de l\'URL de Twitter : https://twitter.com/CETTE PARTIE',
-						'col' => 2
-					]).
-					template::text('youtube', [
-						'label' => 'Youtube',
-						'value' => $this->getData(['config', 'social', 'youtube']),
-						'help' => 'Saisissez votre ID Youtube, il correspond à la partie suivante de l\'URL de Youtube : https://www.youtube.com/channel/CETTE PARTIE',
-						'col' => 2
-					]).
-					template::closeRow().
-					template::subTitle('Système').
-					template::openRow().
-					template::text('version', [
-						'label' => 'Version de ZwiiCMS',
-						'value' => self::$version,
-						'disabled' => true,
-						'col' => 12
-					]).
-					template::newRow().
-					template::button('newVersion', [
-						'href' => 'http://zwiicms.com/',
-						'target' => '_blank',
-						'value' => 'Nouvelle version disponible !',
-						'col' => 3,
-						'classWrapper' => helper::versionCheck() ? 'displayNone' : ''
-					]).
-					template::button('clean', [
-						'value' => 'Vider le cache',
-						'href' => helper::baseUrl() . 'clean',
-						'col' => 3,
-					]).
-					template::button('export', [
-						'value' => 'Exporter le contenu',
-						'href' => helper::baseUrl() . 'export',
-						'col' => 3
-					]).
-					template::newRow().
-					template::checkbox('cookieConsent', true, 'Message de consentement pour l\'utilisation des cookies', [
-						'checked' => $this->getData(['config', 'cookieConsent'])
-					]).
-					template::newRow().
-					template::checkbox('rewrite', true, 'Activer la réécriture d\'URL', [
-						'checked' => helper::rewriteCheck(),
-						'help' => 'Supprime le point d\'interrogation de l\'URL (si vous n\'arrivez pas à cocher la case, vérifiez que le module d\'URL rewriting de votre serveur est bien activé).',
-						'disabled' => !helper::modRewriteCheck() // Check que l'URL rewriting fonctionne sur le serveur
-					]).
-					template::closeRow(),
-				'Personnalisation du thème' =>
-					template::subTitle('Couleurs').
-					template::openRow().
-					template::colorPicker('backgroundColor', [
-						'label' => 'Fond du site',
-						'value' => $this->getData(['config', 'theme', 'color', 'background']),
-						'required' => true,
-						'col' => 3
-					]).
-					template::colorPicker('headerColor', [
-						'label' => 'Bannière',
-						'value' => $this->getData(['config', 'theme', 'color', 'header']),
-						'col' => 3
-					]).
-					template::colorPicker('menuColor', [
-						'label' => 'Menu',
-						'value' => $this->getData(['config', 'theme', 'color', 'menu']),
-						'required' => true,
-						'col' => 3
-					]).
-					template::colorPicker('elementColor', [
-						'label' => 'Éléments',
-						'value' => $this->getData(['config', 'theme', 'color', 'element']),
-						'required' => true,
-						'col' => 3
-					]).
-					template::closeRow().
-					template::subTitle('Polices de caractères').
-					template::openRow().
-					template::select('titleFont', self::$fonts, [
-						'label' => 'Titres',
-						'selected' => $this->getData(['config', 'theme', 'font', 'title']),
-						'col' => 6
-					]).
-					template::select('textFont', self::$fonts, [
-						'label' => 'Texte',
-						'selected' => $this->getData(['config', 'theme', 'font', 'text']),
-						'col' => 6
-					]).
-					template::closeRow().
-					template::subTitle('Site').
-					template::openRow().
-					template::select('siteWidth', [
-						'themeSiteWidthSmall' => 'Petit',
-						'themeSiteWidthMedium' => 'Moyen',
-						'themeSiteWidthLarge' => 'Large'
-					], [
-						'label' => 'Largeur',
-						'selected' => $this->getData(['config', 'theme', 'class', 'siteWidth']),
-						'col' => 6
-					]).
-					template::select('backgroundImage', helper::listUploads('Aucune image', ['png', 'jpeg', 'jpg', 'gif']), [
-						'label' => 'Image du fond',
-						'help' => 'Seule une image de format .png, .gif, .jpg ou .jpeg du gestionnaire de fichiers est acceptée.',
-						'selected' => $this->getData(['config', 'theme', 'image', 'background']),
-						'col' => 6
-					]).
-					template::newRow().
 					template::div([
-						'id' => 'backgroundImageOptions',
-						'class' => 'displayNone',
+						'col' => 6,
+						'class' => 'verticalAlignTop',
 						'text' =>
-							template::select('backgroundImageRepeat', [
-								'themeBackgroundImageRepeatNo' => 'Ne pas répéter',
-								'themeBackgroundImageRepeatX' => 'Sur l\'axe horizontal',
-								'themeBackgroundImageRepeatY' => 'Sur l\'axe vertical',
-								'themeBackgroundImageRepeatAll' => 'Sur les deux axes'
-							], [
-								'label' => 'Répétition',
-								'selected' => $this->getData(['config', 'theme', 'class', 'backgroundImageRepeat']),
-								'col' => 4
+							template::openRow().
+							template::block([
+								'title' => 'Site',
+								'text' =>
+									template::openRow().
+									template::select('favicon', helper::listUploads('Aucune image', ['ico'], null, 16, 16), [
+										'label' => 'Favicon',
+										'help' => 'Seule une image de format .ico en 16x16 du gestionnaire de fichiers est acceptée. Attention si le favicon ne change pas, supprimez le cache de votre navigateur !',
+										'selected' => $this->getData(['config', 'favicon'])
+									]).
+									template::newRow().
+									template::textarea('footer', [
+										'label' => 'Texte du bas de page',
+										'value' => $this->getData(['config', 'footer'])
+									]).
+									template::newRow().
+									template::checkbox('cookieConsent', true, 'Message de consentement pour l\'utilisation des cookies', [
+										'checked' => $this->getData(['config', 'cookieConsent'])
+									]).
+									template::closeRow()
 							]).
-							template::select('backgroundImagePosition', [
-								'themeBackgroundImagePositionCover' => 'Remplir le fond',
-								'themeBackgroundImagePositionTopLeft' => 'En haut à gauche',
-								'themeBackgroundImagePositionTopCenter' => 'En haut au centre',
-								'themeBackgroundImagePositionTopRight' => 'En haut à droite',
-								'themeBackgroundImagePositionCenterLeft' => 'Au milieu à gauche',
-								'themeBackgroundImagePositionCenterCenter' => 'Au milieu au centre',
-								'themeBackgroundImagePositionCenterRight' => 'Au milieu à droite',
-								'themeBackgroundImagePositionBottomLeft' => 'En bas à gauche',
-								'themeBackgroundImagePositionBottomCenter' => 'En bas au centre',
-								'themeBackgroundImagePositionBottomRight' => 'En bas à droite',
-							], [
-								'label' => 'Alignement',
-								'selected' => $this->getData(['config', 'theme', 'class', 'backgroundImagePosition']),
-								'col' => 4
+							template::block([
+								'title' => 'Statistiques',
+								'text' =>
+									template::openRow().
+									template::text('analytics', [
+										'label' => 'Google Analytics',
+										'value' => $this->getData(['config', 'analytics']),
+										'help' => 'Saisissez l\'ID de suivi de votre propriété Google Analytics.',
+										'placeholder' => 'UA-XXXXXXXX-X',
+									]).
+									template::closeRow()
 							]).
-							template::select('backgroundImageAttachment', [
-								'themeBackgroundImageAttachmentScroll' => 'Normale',
-								'themeBackgroundImageAttachmentFixed' => 'Fixe'
-							], [
-								'label' => 'Position',
-								'selected' => $this->getData(['config', 'theme', 'class', 'backgroundImageAttachment']),
-								'col' => 4
-							])
+							template::closeRow()
 					]).
-					template::script('
-						// Affiche/cache les options de l\'image du fond
-						$("#backgroundImage").on("change", function() {
-							var backgroundImageOptionsDOM = $("#backgroundImageOptions");
-							if($(this).val() === "") {
-								backgroundImageOptionsDOM.slideUp();
-							}
-							else {
-								backgroundImageOptionsDOM.slideDown();
-							}
-						}).trigger("change");
-					').
-					template::newRow().
-					template::checkbox('siteRadius', true, 'Arrondir les coins du site', [
-						'checked' => $this->getData(['config', 'theme', 'class', 'siteRadius'])
+					template::div([
+						'col' => 6,
+						'class' => 'verticalAlignTop',
+						'text' =>
+							template::openRow().
+							template::block([
+								'title' => 'Réseaux sociaux',
+								'text' =>
+									template::openRow().
+									template::text('facebook', [
+										'label' => 'Facebook',
+										'value' => $this->getData(['config', 'social', 'facebook']),
+										'help' => 'Saisissez votre ID Facebook, il correspond à la partie suivante de l\'URL de Facebook : https://www.facebook.com/CETTE PARTIE',
+										'col' => 4
+									]).
+									template::text('googleplus', [
+										'label' => 'Google+',
+										'value' => $this->getData(['config', 'social', 'googleplus']),
+										'help' => 'Saisissez votre ID Google+, il correspond à la partie suivante de l\'URL de Google+ : https://plus.google.com/CETTE PARTIE',
+										'col' => 4
+									]).
+									template::text('instagram', [
+										'label' => 'Instagram',
+										'value' => $this->getData(['config', 'social', 'instagram']),
+										'help' => 'Saisissez votre ID Instagram, il correspond à la partie suivante de l\'URL de Instagram : https://www.instagram.com/CETTE PARTIE',
+										'col' => 4
+									]).
+									template::newRow().
+									template::text('pinterest', [
+										'label' => 'Pinterest',
+										'value' => $this->getData(['config', 'social', 'pinterest']),
+										'help' => 'Saisissez votre ID Pinterest, il correspond à la partie suivante de l\'URL de Pinterest : https://pinterest.com/CETTE PARTIE',
+										'col' => 4
+									]).
+									template::text('twitter', [
+										'label' => 'Twitter',
+										'value' => $this->getData(['config', 'social', 'twitter']),
+										'help' => 'Saisissez votre ID Twitter, il correspond à la partie suivante de l\'URL de Twitter : https://twitter.com/CETTE PARTIE',
+										'col' => 4
+									]).
+									template::text('youtube', [
+										'label' => 'Youtube',
+										'value' => $this->getData(['config', 'social', 'youtube']),
+										'help' => 'Saisissez votre ID Youtube, il correspond à la partie suivante de l\'URL de Youtube : https://www.youtube.com/channel/CETTE PARTIE',
+										'col' => 4
+									]).
+									template::closeRow()
+							]).
+							template::block([
+								'title' => 'Système',
+								'text' =>
+									template::openRow().
+									template::text('version', [
+										'label' => 'Version de ZwiiCMS',
+										'value' => self::$version,
+										'disabled' => true,
+										'col' => 12
+									]).
+									template::newRow().
+									template::button('clean', [
+										'value' => 'Vider le cache',
+										'href' => helper::baseUrl() . 'clean',
+										'col' => 6,
+									]).
+									template::button('export', [
+										'value' => 'Exporter le contenu',
+										'href' => helper::baseUrl() . 'export',
+										'col' => 6
+									]).
+									template::newRow().
+									template::button('newVersion', [
+										'href' => 'http://zwiicms.com/',
+										'target' => '_blank',
+										'value' => 'Nouvelle version disponible !',
+										'classWrapper' => helper::versionCheck() ? 'displayNone' : ''
+									]).
+									template::newRow().
+									template::checkbox('rewrite', true, 'Activer la réécriture d\'URL', [
+										'checked' => helper::rewriteCheck(),
+										'help' => 'Supprime le point d\'interrogation de l\'URL (si vous n\'arrivez pas à cocher la case, vérifiez que le module d\'URL rewriting de votre serveur est bien activé).',
+										'disabled' => !helper::modRewriteCheck() // Check que l'URL rewriting fonctionne sur le serveur
+									]).
+									template::closeRow()
+							]).
+							template::closeRow()
 					]).
-					template::newRow().
-					template::checkbox('siteShadow', true, 'Ajouter une ombre autour du site', [
-						'checked' => $this->getData(['config', 'theme', 'class', 'siteShadow'])
-					]).
-					template::closeRow().
-					template::subTitle('Bannière').
-					template::openRow().
-					template::select('headerImage', helper::listUploads('Aucune image', ['png', 'jpeg', 'jpg', 'gif']), [
-						'label' => 'Remplacer le titre par une image',
-						'help' => 'Seule une image de format .png, .gif, .jpg ou .jpeg du gestionnaire de fichiers est acceptée.',
-						'selected' => $this->getData(['config', 'theme', 'image', 'header'])
-					]).
-					template::newRow().
-					template::select('headerPosition', [
-						'themeHeaderPositionHide' => 'Invisible',
-						'themeHeaderPositionTop' => 'Dans le haut de la page',
-						'themeHeaderPositionSite' => 'Dans le site'
-					], [
-						'label' => 'Emplacement',
-						'selected' => $this->getData(['config', 'theme', 'class', 'headerPosition']),
-						'col' => 4
-					]).
-					template::select('headerHeight', [
-						'themeHeaderHeightSmall' => 'Petit',
-						'themeHeaderHeightMedium' => 'Moyen',
-						'themeHeaderHeightLarge' => 'Grand',
-						'themeHeaderHeightAuto' => 'Automatique'
-					], [
-						'label' => 'Hauteur',
-						'selected' => $this->getData(['config', 'theme', 'class', 'headerHeight']),
-						'col' => 4
-					]).
-					template::select('headerTextAlign', [
-						'themeHeaderTextAlignLeft' => 'Gauche',
-						'themeHeaderTextAlignCenter' => 'Centre',
-						'themeHeaderTextAlignRight' => 'Droite'
-					], [
-						'label' => 'Alignement du contenu',
-						'selected' => $this->getData(['config', 'theme', 'class', 'headerTextAlign']),
-						'col' => 4
-					]).
-					template::newRow().
-					template::checkbox('headerMargin', true, 'Aligne la bannière avec le contenu du site', [
-						'checked' => $this->getData(['config', 'theme', 'class', 'headerMargin']),
-						'class' => 'displayNone'
-					]).
-					template::script('
-						// Affiche/cache l\'alignement de la bannière avec le contenu du site
-						$("#headerPosition").on("change", function() {
-							var headerMarginWrapperDOM = $("#headerMarginWrapper");
-							if($(this).val() === "themeHeaderPositionSite") {
-								headerMarginWrapperDOM.slideDown();
-							}
-							else {
-								headerMarginWrapperDOM.slideUp(function() {
-									$("#headerMargin").prop("checked", false);
-								});
-							}
-						}).trigger("change");
-					').
-					template::closeRow().
-					template::subTitle('Menu').
-					template::openRow().
-					template::select('menuPosition', [
-						'themeMenuPositionTop' => 'Dans le haut de la page',
-						'themeMenuPositionSite' => 'Dans le site',
-						'themeMenuPositionHeader' => 'En transparence au dessus de la bannière'
-					], [
-						'label' => 'Emplacement',
-						'selected' => $this->getData(['config', 'theme', 'class', 'menuPosition']),
-						'col' => 4
-					]).
-					template::select('menuHeight', [
-						'themeMenuHeightSmall' => 'Petit',
-						'themeMenuHeightMedium' => 'Moyen',
-						'themeMenuHeightLarge' => 'Grand'
-					], [
-						'label' => 'Hauteur',
-						'selected' => $this->getData(['config', 'theme', 'class', 'menuHeight']),
-						'col' => 4
-					]).
-					template::select('menuTextAlign', [
-						'themeMenuTextAlignLeft' => 'Gauche',
-						'themeMenuTextAlignCenter' => 'Centre',
-						'themeMenuTextAlignRight' => 'Droite'
-					], [
-						'label' => 'Alignement du contenu',
-						'selected' => $this->getData(['config', 'theme', 'class', 'menuTextAlign']),
-						'col' => 4
-					]).
-					template::newRow().
-					template::checkbox('menuMargin', true, 'Aligne le menu avec le contenu du site', [
-						'checked' => $this->getData(['config', 'theme', 'class', 'menuMargin']),
-						'class' => 'displayNone'
-					]).
-					template::script('
-						// Affiche/cache l\'alignement du menu avec le contenu du site
-						$("#menuPosition").on("change", function() {
-							var menuMarginWrapperDOM = $("#menuMarginWrapper");
-							if($(this).val() === "themeMenuPositionSite") {
-								menuMarginWrapperDOM.slideDown();
-							}
-							else {
-								menuMarginWrapperDOM.slideUp(function() {
-									$("#menuMargin").prop("checked", false);
-								});
-							}
-						}).trigger("change");
-					').
 					template::closeRow()
 			]).
-			template::script('
-				// Aperçu de la personnalisation en direct
-				$(".tabContent[data-1=3]").on("change", function() {
-					var tabContentDOM = $(this);
-					var bodyDOM = $("body");
-					var fonts = ' . json_encode(self::$fonts) . ';
-					// Importe les polices de caractères
-					var css = "@import url(\'https://fonts.googleapis.com/css?family=" + $("#textFont option:selected").val() + "|" + $("#titleFont option:selected").val() + "\');";
-					// Supprime les anciennes classes
-					bodyDOM.removeClass();
-					// Ajoute les nouvelles classes
-					// Pour les selects
-					tabContentDOM.find("select").each(function() {
-						var selectDOM = $(this);
-						var option = selectDOM.find("option:selected").val();
-						// Pour le select d\'ajout d\'image dans la bannière
-						if(selectDOM.attr("id") === "headerImage") {
-							$("header img").remove();
-							if(option === "") {
-								bodyDOM.removeClass("themeHeaderImage");
-							}
-							else {
-								bodyDOM.addClass("themeHeaderImage");
-								$("header .inner").append(
-									$("<img>").attr("src", "' . helper::baseUrl(false) . '" + option)
-								);
-							}
-						}
-						// Pour le select d\'ajout d\'image de fond
-						else if(selectDOM.attr("id") === "backgroundImage") {
-							bodyDOM.css("background-image", "url(\'' . helper::baseUrl(false) . '" + option + "\')");
-						}
-						// Pour les select de choix de la police de caractères
-						else if(selectDOM.attr("id") === "textFont" || selectDOM.attr("id") === "titleFont") {
-							// Ajout du css pour le texte
-							if(selectDOM.attr("id") === "textFont") {
-								css += "
-									body {
-										font-family: \'" + fonts[option] + "\', sans-serif;
-									}
-								";
-							}
-							// Ajout du css pour les titres
-							else if(selectDOM.attr("id") === "titleFont") {
-								css += "
-									h1,
-									h2,
-									h3,
-									h4,
-									h5,
-									h6,
-									.tabTitles {
-										font-family: \'" + fonts[option] + "\', sans-serif;
-									}
-								";
-							}
-						}
-						// Pour les autres
-						else {
-							if(option) {
-								bodyDOM.addClass(option);
-							}
-						}
-					});
-					// Pour les inputs
-					tabContentDOM.find("input").each(function() {
-						var inputDOM = $(this);
-						// Cas spécifique pour les checkboxs
-						if(inputDOM.is(":checkbox")) {
-							if(inputDOM.is(":checked")) {
-								var name = inputDOM.attr("name").replace("[]", "");
-								bodyDOM.addClass("theme" + name.charAt(0).toUpperCase() + name.slice(1));
-							}
-						}
-						// Cas simple (ignore les colorPickers)
-						else if(!inputDOM.hasClass("jscolor")) {
-							bodyDOM.addClass(inputDOM.val());
-						}
-					});
-					// Pour les colorPickers
-					$(this).find(".jscolor").each(function() {
-						var jscolorDOM = $(this);
-						// Calcul des couleurs
-						var rgb = hexToRgb(jscolorDOM.val());
-						if(rgb) {
-							var color = rgb.r + "," + rgb.g + "," + rgb.b;
-							var colorDark = (rgb.r - 20) + "," + (rgb.g - 20) + "," + (rgb.b - 20);
-							var colorVeryDark = (rgb.r - 25) + "," + (rgb.g - 25) + "," + (rgb.b - 25);
-							var textVariant = (.213 * rgb.r + .715 * rgb.g + .072 * rgb.b > 127.5) ? "inherit" : "#FFF";
-						}
-						// Couleur du header
-						if(jscolorDOM.attr("id") === "headerColor") {
-							if(rgb) { 
-								css += "
-									/* Couleur normale */
-									header {
-										background-color: rgb(" + color + ");
-									}
-									header h1 {
-										color: " + textVariant + ";
-									}
-								";
-							}
-							else {
-								css += "
-									/* Couleur normale */
-									header {
-										background-color: transparent;
-									}
-								";
-							}
-						}
-						// Couleurs du menu
-						else if(jscolorDOM.attr("id") === "menuColor") {
-							if($("#menuPosition").val() === "themeMenuPositionHeader") {
-								color = "background-color: rgba(" + color + ", .7);";
-								colorDark = "background-color: rgba(" + colorDark + ", .7);";
-								colorVeryDark = "background-color: rgba(" + colorVeryDark + ", .7);";
-							}
-							else {
-								color = "background-color: rgb(" + color + ");";
-								colorDark = "background-color: rgb(" + colorDark + ");";
-								colorDark = "background-color: rgb(" + colorVeryDark + ");";
-							}
-							css += "
-								/* Couleur normale */
-								nav {
-									" + color + "
-								}
-								@media (min-width: 768px) {
-									nav li ul {
-										" + color + "
-									}
-								}
-								nav .toggle span,
-								nav a {
-									color: " + textVariant + ";
-								}
-								/* Couleur foncée */
-								nav .toggle:hover,
-								nav a:hover {
-									" + colorDark + "
-								}
-								/* Couleur très foncée */
-								nav .toggle:active,
-								nav a:active,
-								nav a.current {
-									" + colorVeryDark + "
-								}
-							";
-						}
-						// Couleurs des éléments
-						else if(jscolorDOM.attr("id") === "elementColor") {
-							css += "
-								/* Couleur normale */
-								.alert,
-								input[type=\'submit\'],
-								.button,
-								.pagination a,
-								input[type=\'checkbox\']:checked + label:before,
-								input[type=\'radio\']:checked + label:before,
-								.helpContent {
-									background-color: rgb(" + color + ");
-									color: " + textVariant + ";
-								}
-								h2,
-								h4,
-								h6,
-								a,
-								.tabTitle.current,
-								.helpButton span {
-									color: rgb(" + color + ");
-								}
-								input[type=\'text\']:hover,
-								input[type=\'password\']:hover,
-								.inputFile:hover,
-								select:hover,
-								textarea:hover {
-									border: 1px solid rgb(" + color + ");
-								}
-								/* Couleur foncée */
-								input[type=\'submit\']:hover,
-								.button:hover,
-								.pagination a:hover,
-								input[type=\'checkbox\']:not(:active):checked:hover + label:before,
-								input[type=\'checkbox\']:active + label:before,
-								input[type=\'radio\']:checked:hover + label:before,
-								input[type=\'radio\']:not(:checked):active + label:before {
-									background-color: rgb(" + colorDark + ");
-								}
-								.helpButton span:hover {
-									color: rgb(" + colorDark + ");
-								}
-								/* Couleur très foncée */
-								input[type=\'submit\']:active,
-								.button:active,
-								.pagination a:active {
-									background-color: rgb(" + colorVeryDark + ");
-								}
-							";
-						}
-						// Couleur du fond
-						else if(jscolorDOM.attr("id") === "backgroundColor") {
-							css += "
-								/* Couleur normale */
-								body {
-									background-color: rgb(" + color + ");
-								}
-							";
-						}
-					});
-					// Supprime le css déjà ajouté
-					var headDOM = $("head");
-					headDOM.find("style").remove();
-					// Retourne le nouveau css
-					$("<style>").text(css).appendTo(headDOM);
-				}).trigger("change");
-			').
 			template::openRow().
 			template::submit('submit', [
 				'col' => 2,
@@ -2416,165 +1927,192 @@ class core extends common
 			template::tabs([
 				'Options principales' =>
 					template::openRow().
-					template::text('title', [
-						'label' => 'Titre de la page',
-						'value' => $this->getData(['page', $this->getUrl(0), 'title']),
-						'required' => true
-					]).
-					template::newRow().
-					template::select('parent', $pagesNoParent, [
-						'label' => 'Page parente',
-						'selected' => $selected,
+					template::block([
 						'col' => 6,
-						'classWrapper' => (empty($hierarchy[$this->getUrl(0)]) ?: 'displayNone')
-					]).
-					template::select('position', [], [
-						'label' => 'Position dans le menu',
-						'col' => (empty($hierarchy[$this->getUrl(0)]) ? 6 : 12)
-					]).
-					template::script('
-						// Affiche les bonnes pages dans le select des positions en fonction de la page parente
-						var hierarchy = ' . json_encode($this->getHierarchy()) . ';
-						var pages = ' . json_encode($this->getData(['page'])) . ';
-						$("#parent").on("change", function() {
-							var positionDOM = $("#position");
-							var positionLabelDOM = $("label[form=position]");
-							positionDOM.empty().append(
-								$("<option>").val(0).text("' . helper::translate('Ne pas afficher') . '"),
-								$("<option>").val(1).text("' . helper::translate('Au début') . '")
-							);
-							var parentSelected = $(this).find("option:selected").val();
-							var positionSelected = 0;
-							var positionPrevious = 1;
-							// Aucune page parente selectionnée
-							if(parentSelected === "") {
-								// Liste des pages sans parents
-								for(var key in hierarchy) {
-									// Pour page courante sélectionne la page précédente (pas de - 1 à positionSelected à cause des options par défaut)
-									if(key === "' . $this->getUrl(0) . '") {
-										positionSelected = positionPrevious;
+						'title' => 'Informations générales',
+						'text' =>
+							template::openRow().
+							template::text('title', [
+								'label' => 'Titre de la page',
+								'value' => $this->getData(['page', $this->getUrl(0), 'title']),
+								'required' => true
+							]).
+							template::newRow().
+							template::select('parent', $pagesNoParent, [
+								'label' => 'Page parente',
+								'selected' => $selected,
+								'col' => 6,
+								'classWrapper' => (empty($hierarchy[$this->getUrl(0)]) ?: 'displayNone')
+							]).
+							template::select('position', [], [
+								'label' => 'Position de la page dans le menu',
+								'col' => (empty($hierarchy[$this->getUrl(0)]) ? 6 : 12)
+							]).
+							template::script('
+								// Affiche les bonnes pages dans le select des positions en fonction de la page parente
+								var hierarchy = ' . json_encode($this->getHierarchy()) . ';
+								var pages = ' . json_encode($this->getData(['page'])) . ';
+								$("#parent").on("change", function() {
+									var positionDOM = $("#position");
+									var positionLabelDOM = $("label[form=position]");
+									positionDOM.empty().append(
+										$("<option>").val(0).text("' . helper::translate('Ne pas afficher') . '"),
+										$("<option>").val(1).text("' . helper::translate('Au début') . '")
+									);
+									var parentSelected = $(this).find("option:selected").val();
+									var positionSelected = 0;
+									var positionPrevious = 1;
+									// Aucune page parente selectionnée
+									if(parentSelected === "") {
+										// Liste des pages sans parents
+										for(var key in hierarchy) {
+											// Pour page courante sélectionne la page précédente (pas de - 1 à positionSelected à cause des options par défaut)
+											if(key === "' . $this->getUrl(0) . '") {
+												positionSelected = positionPrevious;
+											}
+											// Sinon ajoute la page à la liste
+											else {
+												// Enregistre la position de cette page afin de la sélectionner si la prochaine page de la liste est la page courante
+												positionPrevious++;
+												// Ajout à la liste
+												positionDOM.append(
+													$("<option>").val(positionPrevious).text("' . helper::translate('Après') . ' \"" + pages[key].title + "\"")
+												);
+											}
+										}
 									}
-									// Sinon ajoute la page à la liste
+									// Un page parente est selectionnée
 									else {
-										// Enregistre la position de cette page afin de la sélectionner si la prochaine page de la liste est la page courante
-										positionPrevious++;
-										// Ajout à la liste
-										positionDOM.append(
-											$("<option>").val(positionPrevious).text("' . helper::translate('Après') . ' \"" + pages[key].title + "\"")
-										);
+										// Liste des pages enfants de la page parente
+										for(var i = 0; i < hierarchy[parentSelected].length; i++) {
+											// Pour page courante sélectionne la page précédente (pas de - 1 à positionSelected à cause des options par défaut)
+											if(hierarchy[parentSelected][i] === "' . $this->getUrl(0) . '") {
+												positionSelected = positionPrevious;
+											}
+											// Sinon ajoute la page à la liste
+											else {
+												// Enregistre la position de cette page afin de la sélectionner si la prochaine page de la liste est la page courante
+												positionPrevious++;
+												// Ajout à la liste
+												positionDOM.append(
+													$("<option>").val(positionPrevious).text("' . helper::translate('Après') . ' \"" + pages[hierarchy[parentSelected][i]].title + "\"")
+												);
+											}
+										}
 									}
-								}
-							}
-							// Un page parente est selectionnée
-							else {
-								// Liste des pages enfants de la page parente
-								for(var i = 0; i < hierarchy[parentSelected].length; i++) {
-									// Pour page courante sélectionne la page précédente (pas de - 1 à positionSelected à cause des options par défaut)
-									if(hierarchy[parentSelected][i] === "' . $this->getUrl(0) . '") {
-										positionSelected = positionPrevious;
+									// Sélectionne la bonne position
+									positionDOM.find("option[value=" + positionSelected + "]").prop("selected", true);
+								}).trigger("change");
+							').
+							template::closeRow()
+					]).
+					template::block([
+						'col' => 6,
+						'title' => 'Module',
+						'text' =>
+							template::openRow().
+							template::hidden('key', [
+								'value' => $this->getUrl(0)
+							]).
+							template::hidden('oldModule', [
+								'value' => $this->getData(['page', $this->getUrl(0), 'module'])
+							]).
+							template::select('module', helper::listModules('Aucun module'), [
+								'label' => 'Inclure le module',
+								'help' => 'En cas de changement de module, les données du module précédent seront supprimées.',
+								'selected' => $this->getData(['page', $this->getUrl(0), 'module']),
+								'col' => 10
+							]).
+							template::button('admin', [
+								'value' => template::ico('gear'),
+								'href' => helper::baseUrl() . 'module/' . $this->getUrl(0),
+								'disabled' => !(bool)$this->getData(['page', $this->getUrl(0), 'module']),
+								'col' => 2
+							]).
+							template::script('
+								// Enregistre le module de la page en AJAX
+								$("#module").on("change", function() {
+									var newModule = $("#module").val();
+									var admin = $("#admin");
+									var ok = true;
+									if($("#oldModule").val() != "") {
+										ok = confirm("' . helper::translate('Si vous confirmez, les données du module précédent seront supprimées !') . '");
 									}
-									// Sinon ajoute la page à la liste
-									else {
-										// Enregistre la position de cette page afin de la sélectionner si la prochaine page de la liste est la page courante
-										positionPrevious++;
-										// Ajout à la liste
-										positionDOM.append(
-											$("<option>").val(positionPrevious).text("' . helper::translate('Après') . ' \"" + pages[hierarchy[parentSelected][i]].title + "\"")
-										);
+									if(ok) {
+										$.ajax({
+											type: "POST",
+											url: "' . helper::baseUrl() . 'save/" + $("#key").val(),
+											data: {module: newModule},
+											success: function() {
+												$("#oldModule").val(newModule);
+												if(newModule == "") {
+													admin.addClass("disabled");
+												}
+												else {
+													admin.removeClass("disabled");
+													admin.attr("target", "_blank")
+												}
+											},
+											error: function() {
+												alert("' . helper::translate('Impossible d\"enregistrer le module !') . '");
+												admin.addClass("disabled");
+											}
+										});
 									}
-								}
-							}
-							// Sélectionne la bonne position
-							positionDOM.find("option[value=" + positionSelected + "]").prop("selected", true);
-						}).trigger("change");
-					').
+								});
+							').
+							template::newRow().
+							template::select('modulePosition', [
+								'top' => 'Haut',
+								'bottom' => 'Bas',
+								'free' => 'Libre'
+							], [
+								'label' => 'Position du module dans la page',
+								'selected' => $this->getData(['page', $this->getUrl(0), 'modulePosition']),
+								'help' => 'En position libre vous devez ajouter manuellement le module en plaçant la balise [MODULE] dans votre page.'
+							]).
+							template::closeRow()
+					]).
 					template::newRow().
 					template::textarea('content', [
 						'value' => $this->getData(['page', $this->getUrl(0), 'content']),
 						'editor' => true
 					]).
-					template::newRow().
-					template::hidden('key', [
-						'value' => $this->getUrl(0)
-					]).
-					template::hidden('oldModule', [
-						'value' => $this->getData(['page', $this->getUrl(0), 'module'])
-					]).
-					template::select('module', helper::listModules('Aucun module'), [
-						'label' => 'Inclure le module',
-						'help' => 'En cas de changement de module, les données du module précédent seront supprimées.',
-						'selected' => $this->getData(['page', $this->getUrl(0), 'module']),
-						'col' => 11
-					]).
-					template::button('admin', [
-						'value' => template::ico('gear'),
-						'href' => helper::baseUrl() . 'module/' . $this->getUrl(0),
-						'disabled' => !(bool)$this->getData(['page', $this->getUrl(0), 'module']),
-						'col' => 1
-					]).
-					template::script('
-							// Enregistre le module de la page en AJAX
-							$("#module").on("change", function() {
-								var newModule = $("#module").val();
-								var admin = $("#admin");
-								var ok = true;
-								if($("#oldModule").val() != "") {
-									ok = confirm("' . helper::translate('Si vous confirmez, les données du module précédent seront supprimées !') . '");
-								}
-								if(ok) {
-									$.ajax({
-										type: "POST",
-										url: "' . helper::baseUrl() . 'save/" + $("#key").val(),
-										data: {module: newModule},
-										success: function() {
-											$("#oldModule").val(newModule);
-											if(newModule == "") {
-												admin.addClass("disabled");
-											}
-											else {
-												admin.removeClass("disabled");
-												admin.attr("target", "_blank")
-											}
-										},
-										error: function() {
-											alert("' . helper::translate('Impossible d\"enregistrer le module !') . '");
-											admin.addClass("disabled");
-										}
-									});
-								}
-							});
-						').
 					template::closeRow(),
 				'Options avancées' =>
 					template::openRow().
-					template::text('metaTitle', [
-						'label' => 'Méta titre de la page',
-						'help' => 'Si le champ est vide, le titre du site est utilisé.',
-						'value' => $this->getData(['page', $this->getUrl(0), 'metaTitle'])
+					template::block([
+						'col' => 6,
+						'title' => 'Métas',
+						'text' =>
+							template::openRow().
+							template::text('metaTitle', [
+								'label' => 'Méta titre de la page',
+								'help' => 'Si le champ est vide, le titre du site est utilisé.',
+								'value' => $this->getData(['page', $this->getUrl(0), 'metaTitle'])
+							]).
+							template::newRow().
+							template::textarea('description', [
+								'label' => 'Méta description de la page',
+								'help' => 'Si le champ est vide, la description du site est utilisée.',
+								'value' => $this->getData(['page', $this->getUrl(0), 'description'])
+							]).
+							template::closeRow()
 					]).
-					template::newRow().
-					template::textarea('description', [
-						'label' => 'Méta description de la page',
-						'help' => 'Si le champ est vide, la description du site est utilisée.',
-						'value' => $this->getData(['page', $this->getUrl(0), 'description'])
-					]).
-					template::select('modulePosition', [
-						'top' => 'Haut',
-						'bottom' => 'Bas',
-						'free' => 'Libre'
-					], [
-						'label' => 'Position du module dans la page',
-						'selected' => $this->getData(['page', $this->getUrl(0), 'modulePosition']),
-						'help' => 'En position libre vous devez ajouter manuellement le module en plaçant la balise [MODULE] dans votre page.'
-					]).
-					template::newRow().
-					template::checkbox('hideTitle', true, 'Ne pas afficher le titre en mode public', [
-						'checked' => $this->getData(['page', $this->getUrl(0), 'hideTitle'])
-					]).
-					template::newRow().
-					template::checkbox('blank', true, 'Ouvrir dans un nouvel onglet en mode public', [
-						'checked' => $this->getData(['page', $this->getUrl(0), 'blank'])
-					]).
+					template::block([
+						'col' => 6,
+						'title' => 'Divers',
+						'text' =>
+							template::openRow().
+							template::checkbox('hideTitle', true, 'Ne pas afficher le titre en mode public', [
+								'checked' => $this->getData(['page', $this->getUrl(0), 'hideTitle'])
+							]).
+							template::newRow().
+							template::checkbox('blank', true, 'Ouvrir dans un nouvel onglet en mode public', [
+								'checked' => $this->getData(['page', $this->getUrl(0), 'blank'])
+							]).
+							template::closeRow()
+				]	).
 					template::closeRow()
 			]).
 			template::openRow().
@@ -2721,23 +2259,26 @@ class core extends common
 		// Contenu de la page
 		self::$title = helper::translate('Gestionnaire de fichiers');
 		self::$content =
-			template::title('Envoyer un fichier').
 			template::openForm('form', [
 				'enctype' => 'multipart/form-data'
 			]).
-			template::openRow().
-			template::file('file', [
-				'label' => 'Parcourir mes fichiers',
-				'help' => helper::translate('Les formats de fichiers autorisés sont :') . ' ' . implode(', .', self::$managerExtensions) . '.',
-				'col' => '10'
+			template::block([
+				'col' => 0,
+				'title' => 'Envoyer un fichier',
+				'text' =>
+					template::openRow().
+					template::file('file', [
+						'label' => 'Parcourir mes fichiers',
+						'help' => helper::translate('Les formats de fichiers autorisés sont :') . ' ' . implode(', .', self::$managerExtensions) . '.',
+						'col' => 10
+					]).
+					template::submit('submit', [
+						'value' => 'Envoyer',
+						'col' => 2
+					]).
+					template::closeRow()
 			]).
-			template::submit('submit', [
-				'value' => 'Envoyer',
-				'col' => '2'
-			]).
-			template::closeRow().
 			template::closeForm().
-			template::title('Liste des fichiers').
 			(self::$content ? self::$content : template::subTitle('Aucun fichier...'));
 	}
 
@@ -2879,6 +2420,568 @@ class core extends common
 			}
 		}
 		self::$content = template::ul($pages);
+	}
+
+	/** Thème */
+	public function theme()
+	{
+		// Traitement du formulaire
+		if($this->getPost('submit')) {
+			// Double vérification pour le mot de passe si il a changé
+			if($this->getPost('newPassword')) {
+				$newPassword = $this->getPost('newPassword', helper::PASSWORD);
+				// Bloque le changement de mot de passe en mode démo
+				if(self::$demo) {
+					$newPassword = $this->getData(['config', 'password']);
+					template::$notices['newPassword'] = 'Action impossible en mode démonstration !';
+				}
+				// Ne change pas le mot de passe et crée une notice si la confirmation ne correspond pas au mot de passe
+				elseif($newPassword !== $this->getPost('confirmPassword', helper::PASSWORD)) {
+					$newPassword = $this->getData(['config', 'password']);
+					template::$notices['confirmPassword'] = 'La confirmation ne correspond pas au mot de passe';
+				}
+			}
+			// Sinon conserve le mot de passe d'origine
+			else {
+				$newPassword = $this->getData(['config', 'password']);
+			}
+			// Modifie la configuration
+			$this->setData([
+				'theme',
+				[
+					'class' => [
+						'backgroundImageRepeat' => $this->getPost('backgroundImageRepeat', helper::STRING),
+						'backgroundImagePosition' => $this->getPost('backgroundImagePosition', helper::STRING),
+						'backgroundImageAttachment' => $this->getPost('backgroundImageAttachment', helper::STRING),
+						'headerHeight' => $this->getPost('headerHeight', helper::STRING),
+						'headerMargin' => $this->getPost('headerMargin', helper::BOOLEAN),
+						'headerPosition' => $this->getPost('headerPosition', helper::STRING),
+						'headerTextAlign' => $this->getPost('headerTextAlign', helper::STRING),
+						'menuHeight' => $this->getPost('menuHeight', helper::STRING),
+						'menuMargin' => $this->getPost('menuMargin', helper::BOOLEAN),
+						'menuPosition' => $this->getPost('menuPosition', helper::STRING),
+						'menuTextAlign' => $this->getPost('menuTextAlign', helper::STRING),
+						'siteRadius' => $this->getPost('siteRadius', helper::BOOLEAN),
+						'siteShadow' => $this->getPost('siteShadow', helper::BOOLEAN),
+						'siteWidth' => $this->getPost('siteWidth', helper::STRING)
+					],
+					'color' => [
+						'background' => $this->getPost('backgroundColor', helper::STRING),
+						'element' => $this->getPost('elementColor', helper::STRING),
+						'header' => $this->getPost('headerColor', helper::STRING),
+						'menu' => $this->getPost('menuColor', helper::STRING)
+					],
+					'font' => [
+						'text' => $this->getPost('textFont', helper::STRING),
+						'title' => $this->getPost('titleFont', helper::STRING)
+					],
+					'image' => [
+						'background' => $this->getPost('backgroundImage', helper::URL),
+						'header' => $this->getPost('headerImage', helper::URL)
+					]
+				]
+			]);
+			// Enregistre les données et supprime le cache
+			$this->saveData(true);
+			// Notification de modification
+			$this->setNotification('Configuration enregistrée avec succès !');
+			// Redirige vers l'URL courante
+			helper::redirect($this->getUrl(null, false));
+		}
+		// Contenu de la page
+		self::$title = helper::translate('Personnalisation');
+		self::$content =
+			template::openForm().
+			template::tabs([
+				'Options du site' =>
+					template::openRow().
+					template::block([
+						'col' => 4,
+						'title' => 'Couleurs et image',
+						'text' =>
+							template::openRow().
+							template::colorPicker('backgroundColor', [
+								'label' => 'Couleur du fond',
+								'value' => $this->getData(['theme', 'color', 'background']),
+								'required' => true,
+								'col' => 6
+							]).
+							template::colorPicker('elementColor', [
+								'label' => 'Couleur des titre',
+								'value' => $this->getData(['theme', 'color', 'element']),
+								'required' => true,
+								'col' => 6
+							]).
+							template::newRow().
+							template::select('backgroundImage', helper::listUploads('Aucune image', ['png', 'jpeg', 'jpg', 'gif']), [
+								'label' => 'Image du fond',
+								'help' => 'Seule une image de format .png, .gif, .jpg ou .jpeg du gestionnaire de fichiers est acceptée.',
+								'selected' => $this->getData(['theme', 'image', 'background'])
+							]).
+							template::script('
+								// Affiche/cache les options de l\'image du fond
+								$("#backgroundImage").on("change", function() {
+									var backgroundImageOptionsDOM = $("#backgroundImageOptions");
+									if($(this).val() === "") {
+										backgroundImageOptionsDOM.slideUp();
+									}
+									else {
+										backgroundImageOptionsDOM.slideDown();
+									}
+								}).trigger("change");
+							').
+							template::closeRow().
+							template::div([
+								'id' => 'backgroundImageOptions',
+								'class' => 'displayNone',
+								'text' =>
+									template::openRow().
+									template::select('backgroundImageRepeat', [
+										'themeBackgroundImageRepeatNo' => 'Ne pas répéter',
+										'themeBackgroundImageRepeatX' => 'Sur l\'axe horizontal',
+										'themeBackgroundImageRepeatY' => 'Sur l\'axe vertical',
+										'themeBackgroundImageRepeatAll' => 'Sur les deux axes'
+									], [
+										'label' => 'Répétition',
+										'selected' => $this->getData(['theme', 'class', 'backgroundImageRepeat']),
+										'col' => 6
+									]).
+									template::select('backgroundImagePosition', [
+										'themeBackgroundImagePositionCover' => 'Remplir le fond',
+										'themeBackgroundImagePositionTopLeft' => 'En haut à gauche',
+										'themeBackgroundImagePositionTopCenter' => 'En haut au centre',
+										'themeBackgroundImagePositionTopRight' => 'En haut à droite',
+										'themeBackgroundImagePositionCenterLeft' => 'Au milieu à gauche',
+										'themeBackgroundImagePositionCenterCenter' => 'Au milieu au centre',
+										'themeBackgroundImagePositionCenterRight' => 'Au milieu à droite',
+										'themeBackgroundImagePositionBottomLeft' => 'En bas à gauche',
+										'themeBackgroundImagePositionBottomCenter' => 'En bas au centre',
+										'themeBackgroundImagePositionBottomRight' => 'En bas à droite',
+									], [
+										'label' => 'Alignement',
+										'selected' => $this->getData(['theme', 'class', 'backgroundImagePosition']),
+										'col' => 6
+									]).
+									template::newRow().
+									template::select('backgroundImageAttachment', [
+										'themeBackgroundImageAttachmentScroll' => 'Normale',
+										'themeBackgroundImageAttachmentFixed' => 'Fixe'
+									], [
+										'label' => 'Position',
+										'selected' => $this->getData(['theme', 'class', 'backgroundImageAttachment']),
+										'col' => 6
+									]).
+									template::closeRow()
+							])
+					]).
+					template::block([
+						'col' => 4,
+						'title' => 'Polices',
+						'text' =>
+							template::openRow().
+							template::select('titleFont', self::$fonts, [
+								'label' => 'Police des titres',
+								'selected' => $this->getData(['theme', 'font', 'title'])
+							]).
+							template::newRow().
+							template::select('textFont', self::$fonts, [
+								'label' => 'Police du texte',
+								'selected' => $this->getData(['theme', 'font', 'text'])
+							]).
+							template::closeRow()
+					]).
+					template::block([
+						'col' => 4,
+						'title' => 'Disposition',
+						'text' =>
+							template::openRow().
+							template::select('siteWidth', [
+								'themeSiteWidthSmall' => 'Petit',
+								'themeSiteWidthMedium' => 'Moyen',
+								'themeSiteWidthLarge' => 'Large'
+							], [
+								'label' => 'Largeur du site',
+								'selected' => $this->getData(['theme', 'class', 'siteWidth'])
+							]).
+							template::newRow().
+							template::checkbox('siteRadius', true, 'Coins du site arrondis', [
+								'checked' => $this->getData(['theme', 'class', 'siteRadius'])
+							]).
+							template::newRow().
+							template::checkbox('siteShadow', true, 'Ombre autour du site', [
+								'checked' => $this->getData(['theme', 'class', 'siteShadow'])
+							]).
+							template::closeRow()
+					]).
+					template::closeRow(),
+				'Options de la bannière' =>
+					template::openRow().
+					template::block([
+						'col' => 4,
+						'title' => 'Couleur et image',
+						'text' =>
+							template::openRow().
+							template::colorPicker('headerColor', [
+								'label' => 'Couleur de la bannière',
+								'value' => $this->getData(['theme', 'color', 'header'])
+							]).
+							template::newRow().
+							template::select('headerImage', helper::listUploads('Aucune image', ['png', 'jpeg', 'jpg', 'gif']), [
+								'label' => 'Remplacer le titre par une image',
+								'help' => 'Seule une image de format .png, .gif, .jpg ou .jpeg du gestionnaire de fichiers est acceptée.',
+								'selected' => $this->getData(['theme', 'image', 'header'])
+							]).
+							template::closeRow()
+					]).
+					template::block([
+						'col' => 8,
+						'title' => 'Disposition',
+						'text' =>
+							template::openRow().
+							template::select('headerPosition', [
+								'themeHeaderPositionHide' => 'Invisible',
+								'themeHeaderPositionTop' => 'Dans le haut de la page',
+								'themeHeaderPositionSite' => 'Dans le site'
+							], [
+								'label' => 'Emplacement',
+								'selected' => $this->getData(['theme', 'class', 'headerPosition']),
+								'col' => 4
+							]).
+							template::select('headerHeight', [
+								'themeHeaderHeightSmall' => 'Petit',
+								'themeHeaderHeightMedium' => 'Moyen',
+								'themeHeaderHeightLarge' => 'Grand',
+								'themeHeaderHeightAuto' => 'Automatique'
+							], [
+								'label' => 'Hauteur',
+								'selected' => $this->getData(['theme', 'class', 'headerHeight']),
+								'col' => 4
+							]).
+							template::select('headerTextAlign', [
+								'themeHeaderTextAlignLeft' => 'Gauche',
+								'themeHeaderTextAlignCenter' => 'Centre',
+								'themeHeaderTextAlignRight' => 'Droite'
+							], [
+								'label' => 'Alignement du contenu',
+								'selected' => $this->getData(['theme', 'class', 'headerTextAlign']),
+								'col' => 4
+							]).
+							template::newRow().
+							template::checkbox('headerMargin', true, 'Aligner avec le contenu du site', [
+								'checked' => $this->getData(['theme', 'class', 'headerMargin']),
+								'class' => 'displayNone'
+							]).
+							template::closeRow().
+							template::script('
+								// Affiche/cache l\'alignement de la bannière avec le contenu du site
+								$("#headerPosition").on("change", function() {
+									var headerMarginWrapperDOM = $("#headerMarginWrapper");
+									if($(this).val() === "themeHeaderPositionSite") {
+										headerMarginWrapperDOM.slideDown();
+									}
+									else {
+										headerMarginWrapperDOM.slideUp(function() {
+											$("#headerMargin").prop("checked", false);
+										});
+									}
+								}).trigger("change");
+							')
+					]).
+					template::closeRow(),
+				'Options du menu' =>
+					template::openRow().
+					template::block([
+						'col' => 4,
+						'title' => 'Couleur',
+						'text' =>
+							template::openRow().
+							template::colorPicker('menuColor', [
+								'label' => 'Couleur du menu',
+								'value' => $this->getData(['theme', 'color', 'menu']),
+								'required' => true
+							]).
+							template::closeRow()
+					]).
+					template::block([
+						'col' => 8,
+						'title' => 'Disposition',
+						'text' =>
+							template::openRow().
+							template::select('menuPosition', [
+								'themeMenuPositionTop' => 'Dans le haut de la page',
+								'themeMenuPositionSite' => 'Dans le site',
+								'themeMenuPositionHeader' => 'En transparence au dessus de la bannière'
+							], [
+								'label' => 'Emplacement',
+								'selected' => $this->getData(['theme', 'class', 'menuPosition']),
+								'col' => 4
+							]).
+							template::select('menuHeight', [
+								'themeMenuHeightSmall' => 'Petit',
+								'themeMenuHeightMedium' => 'Moyen',
+								'themeMenuHeightLarge' => 'Grand'
+							], [
+								'label' => 'Hauteur',
+								'selected' => $this->getData(['theme', 'class', 'menuHeight']),
+								'col' => 4
+							]).
+							template::select('menuTextAlign', [
+								'themeMenuTextAlignLeft' => 'Gauche',
+								'themeMenuTextAlignCenter' => 'Centre',
+								'themeMenuTextAlignRight' => 'Droite'
+							], [
+								'label' => 'Alignement du contenu',
+								'selected' => $this->getData(['theme', 'class', 'menuTextAlign']),
+								'col' => 4
+							]).
+							template::newRow().
+							template::checkbox('menuMargin', true, 'Aligner avec le contenu du site', [
+								'checked' => $this->getData(['theme', 'class', 'menuMargin']),
+								'class' => 'displayNone'
+							]).
+							template::closeRow().
+							template::script('
+								// Affiche/cache l\'alignement du menu avec le contenu du site
+								$("#menuPosition").on("change", function() {
+									var menuMarginWrapperDOM = $("#menuMarginWrapper");
+									if($(this).val() === "themeMenuPositionSite") {
+										menuMarginWrapperDOM.slideDown();
+									}
+									else {
+										menuMarginWrapperDOM.slideUp(function() {
+											$("#menuMargin").prop("checked", false);
+										});
+									}
+								}).trigger("change");
+							')
+					]).
+					template::closeRow()
+			]).
+			template::script('
+				// Aperçu de la personnalisation en direct
+				$("section").on("change", function() {
+					var tabContentDOM = $(this);
+					var bodyDOM = $("body");
+					var fonts = ' . json_encode(self::$fonts) . ';
+					// Importe les polices de caractères
+					var css = "@import url(\'https://fonts.googleapis.com/css?family=" + $("#textFont option:selected").val() + "|" + $("#titleFont option:selected").val() + "\');";
+					// Supprime les anciennes classes
+					bodyDOM.removeClass();
+					// Ajoute les nouvelles classes
+					// Pour les selects
+					tabContentDOM.find("select").each(function() {
+						var selectDOM = $(this);
+						var option = selectDOM.find("option:selected").val();
+						// Pour le select d\'ajout d\'image dans la bannière
+						if(selectDOM.attr("id") === "headerImage") {
+							$("header img").remove();
+							if(option === "") {
+								bodyDOM.removeClass("themeHeaderImage");
+							}
+							else {
+								bodyDOM.addClass("themeHeaderImage");
+								$("header .inner").append(
+									$("<img>").attr("src", "' . helper::baseUrl(false) . '" + option)
+								);
+							}
+						}
+						// Pour le select d\'ajout d\'image de fond
+						else if(selectDOM.attr("id") === "backgroundImage") {
+							bodyDOM.css("background-image", "url(\'' . helper::baseUrl(false) . '" + option + "\')");
+						}
+						// Pour les select de choix de la police de caractères
+						else if(selectDOM.attr("id") === "textFont" || selectDOM.attr("id") === "titleFont") {
+							// Ajout du css pour le texte
+							if(selectDOM.attr("id") === "textFont") {
+								css += "
+									body {
+										font-family: \'" + fonts[option] + "\', sans-serif;
+									}
+								";
+							}
+							// Ajout du css pour les titres
+							else if(selectDOM.attr("id") === "titleFont") {
+								css += "
+									h1,
+									h2,
+									h3,
+									h4,
+									h5,
+									h6,
+									.tabTitles {
+										font-family: \'" + fonts[option] + "\', sans-serif;
+									}
+								";
+							}
+						}
+						// Pour les autres
+						else {
+							if(option) {
+								bodyDOM.addClass(option);
+							}
+						}
+					});
+					// Pour les inputs
+					tabContentDOM.find("input").each(function() {
+						var inputDOM = $(this);
+						// Cas spécifique pour les checkboxs
+						if(inputDOM.is(":checkbox")) {
+							if(inputDOM.is(":checked")) {
+								var name = inputDOM.attr("name").replace("[]", "");
+								bodyDOM.addClass("theme" + name.charAt(0).toUpperCase() + name.slice(1));
+							}
+						}
+						// Cas simple (ignore les colorPickers)
+						else if(!inputDOM.hasClass("jscolor")) {
+							bodyDOM.addClass(inputDOM.val());
+						}
+					});
+					// Pour les colorPickers
+					$(this).find(".jscolor").each(function() {
+						var jscolorDOM = $(this);
+						// Calcul des couleurs
+						var rgb = hexToRgb(jscolorDOM.val());
+						if(rgb) {
+							var color = rgb.r + "," + rgb.g + "," + rgb.b;
+							var colorDark = (rgb.r - 20) + "," + (rgb.g - 20) + "," + (rgb.b - 20);
+							var colorVeryDark = (rgb.r - 25) + "," + (rgb.g - 25) + "," + (rgb.b - 25);
+							var textVariant = (.213 * rgb.r + .715 * rgb.g + .072 * rgb.b > 127.5) ? "inherit" : "#FFF";
+						}
+						// Couleur du header
+						if(jscolorDOM.attr("id") === "headerColor") {
+							if(rgb) { 
+								css += "
+									/* Couleur normale */
+									header {
+										background-color: rgb(" + color + ");
+									}
+									header h1 {
+										color: " + textVariant + ";
+									}
+								";
+							}
+							else {
+								css += "
+									/* Couleur normale */
+									header {
+										background-color: transparent;
+									}
+								";
+							}
+						}
+						// Couleurs du menu
+						else if(jscolorDOM.attr("id") === "menuColor") {
+							if($("#menuPosition").val() === "themeMenuPositionHeader") {
+								color = "background-color: rgba(" + color + ", .7);";
+								colorDark = "background-color: rgba(" + colorDark + ", .7);";
+								colorVeryDark = "background-color: rgba(" + colorVeryDark + ", .7);";
+							}
+							else {
+								color = "background-color: rgb(" + color + ");";
+								colorDark = "background-color: rgb(" + colorDark + ");";
+								colorDark = "background-color: rgb(" + colorVeryDark + ");";
+							}
+							css += "
+								/* Couleur normale */
+								nav {
+									" + color + "
+								}
+								@media (min-width: 768px) {
+									nav li ul {
+										" + color + "
+									}
+								}
+								nav .toggle span,
+								nav a {
+									color: " + textVariant + ";
+								}
+								/* Couleur foncée */
+								nav .toggle:hover,
+								nav a:hover {
+									" + colorDark + "
+								}
+								/* Couleur très foncée */
+								nav .toggle:active,
+								nav a:active,
+								nav a.current {
+									" + colorVeryDark + "
+								}
+							";
+						}
+						// Couleurs des éléments
+						else if(jscolorDOM.attr("id") === "elementColor") {
+							css += "
+								/* Couleur normale */
+								.alert,
+								input[type=\'submit\'],
+								.button,
+								.pagination a,
+								input[type=\'checkbox\']:checked + label:before,
+								input[type=\'radio\']:checked + label:before,
+								.helpContent {
+									background-color: rgb(" + color + ");
+									color: " + textVariant + ";
+								}
+								h2,
+								h4,
+								h6,
+								a,
+								.tabTitle.current,
+								.helpButton span {
+									color: rgb(" + color + ");
+								}
+								input[type=\'text\']:hover,
+								input[type=\'password\']:hover,
+								.inputFile:hover,
+								select:hover,
+								textarea:hover {
+									border: 1px solid rgb(" + color + ");
+								}
+								/* Couleur foncée */
+								input[type=\'submit\']:hover,
+								.button:hover,
+								.pagination a:hover,
+								input[type=\'checkbox\']:not(:active):checked:hover + label:before,
+								input[type=\'checkbox\']:active + label:before,
+								input[type=\'radio\']:checked:hover + label:before,
+								input[type=\'radio\']:not(:checked):active + label:before {
+									background-color: rgb(" + colorDark + ");
+								}
+								.helpButton span:hover {
+									color: rgb(" + colorDark + ");
+								}
+								/* Couleur très foncée */
+								input[type=\'submit\']:active,
+								.button:active,
+								.pagination a:active {
+									background-color: rgb(" + colorVeryDark + ");
+								}
+							";
+						}
+						// Couleur du fond
+						else if(jscolorDOM.attr("id") === "backgroundColor") {
+							css += "
+								/* Couleur normale */
+								body {
+									background-color: rgb(" + color + ");
+								}
+							";
+						}
+					});
+					// Supprime le css déjà ajouté
+					var headDOM = $("head");
+					headDOM.find("style").remove();
+					// Retourne le nouveau css
+					$("<style>").text(css).appendTo(headDOM);
+				}).trigger("change");
+			').
+			template::openRow().
+			template::submit('submit', [
+				'col' => 2,
+				'offset' => 10
+			]).
+			template::closeRow().
+			template::closeForm();
 	}
 
 	/**
@@ -3578,6 +3681,39 @@ class template
 	}
 
 	/**
+	 * Crée un bloc
+	 * @param  array  $attributes Liste des attributs en fonction des attributs disponibles dans la fonction ($key => $value)
+	 * @return string
+	 */
+	public static function block($attributes = [])
+	{
+		// Attributs possibles
+		$attributes = array_merge([
+			'id' => '',
+			'title' => '',
+			'text' => '',
+			'class' => '',
+			'classWrapper' => '',
+			'col' => 12,
+			'offset' => 0
+		], $attributes);
+
+		// Début col
+		$html = '<div id="' . $attributes['id'] . 'Wrapper" class="blockWrapper col' . $attributes['col'] . ' offset' . $attributes['offset'] . ' ' . $attributes['classWrapper'] . '">';
+		// Le block
+		$html .= sprintf(
+			'<div class="block %s" %s>' . ($attributes['title'] ? template::subTitle($attributes['title']) : '') . '%s</div>',
+			$attributes['class'],
+			self::sprintAttributes($attributes, ['class', 'text', 'title']),
+			helper::translate($attributes['text'])
+		);
+		// Fin col
+		$html .= '</div>';
+		// Retourne le html
+		return $html;
+	}
+
+	/**
 	 * Crée un bouton
 	 * @param  string $nameId     Nom & id du bouton
 	 * @param  array  $attributes Liste des attributs en fonction des attributs disponibles dans la méthode ($key => $value)
@@ -4219,6 +4355,30 @@ class template
 		// Retourne le html
 		return sprintf(
 			'<h4 %s>%s</h4>',
+			self::sprintAttributes($attributes),
+			helper::translate($text)
+		);
+	}
+
+	/**
+	 * Crée un petit titre
+	 * @param  string $text Texte du petit titre
+	 * @param  array  $attributes Liste des attributs en fonction des attributs disponibles dans la fonction ($key => $value)
+	 * @return string
+	 */
+	public static function smallTitle($text, $attributes = [])
+	{
+		// Attributs possibles
+		$attributes = array_merge([
+			'id' => '',
+			'class' => '',
+			'data-1' => '',
+			'data-2' => '',
+			'data-3' => ''
+		], $attributes);
+		// Retourne le html
+		return sprintf(
+			'<h5 %s>%s</h5>',
 			self::sprintAttributes($attributes),
 			helper::translate($text)
 		);

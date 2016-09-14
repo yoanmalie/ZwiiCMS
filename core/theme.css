@@ -55,10 +55,10 @@ h4 {
 	font-size: 1em;
 }
 h5 {
-	font-size: .8em;
+	font-size: .9em;
 }
 h6 {
-	font-size: .7em;
+	font-size: .8em;
 }
 
 /* Listes */
@@ -190,7 +190,7 @@ td > .col12 {
 }
 #panel a {
 	display: inline-block;
-	padding: 0 14px;
+	padding: 0 12px;
 	color: #E1E1E1;
 }
 #panel a:hover {
@@ -521,6 +521,25 @@ label {
  * Inputs spécifiques
  */
 
+/* Bloc */
+.blockWrapper {
+	vertical-align: top !important;
+	margin: 10px 0;
+}
+.row .blockWrapper {
+	margin: 0;
+}
+.block {
+	background: #F5F5F5;
+	padding: 20px;
+}
+.block h4 {
+	margin: -20px -20px 10px -20px;
+	padding: 10px;
+	background: #E9E9E9;
+	color: #555;
+}
+
 /* Bouton */
 .button {
 	width: 100%;
@@ -553,9 +572,6 @@ label {
 }
 
 /* Pagination */
-.pagination {
-	padding: 10px 0;
-}
 .pagination a {
 	display: inline-block;
 	padding: 10px;
@@ -825,6 +841,16 @@ td.col12 {
 }
 .clearBoth {
 	clear: both;
+}
+.verticalAlignTop {
+	vertical-align: top;
+}
+
+/**
+ * Icône
+ */
+.zwiico-margin:before{
+	margin-right: 5px;
 }
 
 /**
