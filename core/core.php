@@ -944,7 +944,7 @@ class core extends common
 		// - le layout utilisé est LAYOUT
 		$url = str_replace('/', '_', $this->getUrl());
 		if(
-			$this->getData(['page', $this->getUrl(0)])
+			$this->getData(['page', $this->getUrl(0, false)])
 			AND self::$cache
 			AND !self::getCookie('PASSWORD')
 			AND !file_exists('core/cache/' . $url . '.html')
