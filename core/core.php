@@ -1019,7 +1019,10 @@ class core extends common
 	public function showFooterLinks()
 	{
 		$login = '';
-		if($this->getData(['config', 'password']) !== self::getCookie('PASSWORD')) {
+		if(
+			$this->getUrl(0, false) !== 'login'
+			AND $this->getData(['config', 'password']) !== self::getCookie('PASSWORD')
+		) {
 			$login = ' | ' . template::a(helper::baseUrl() . 'login/' . $this->getUrl(null, false), 'Connexion');
 		}
 		return
