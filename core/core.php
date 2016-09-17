@@ -1029,9 +1029,7 @@ class core extends common
 				'target' => '_blank'
 			]).
 			' | '.
-			template::a(helper::baseUrl() . 'sitemap', 'Plan du site', [
-				'target' => '_blank'
-			]).
+			template::a(helper::baseUrl() . 'sitemap', 'Plan du site').
 			$login;
 	}
 
