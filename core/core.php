@@ -1202,7 +1202,7 @@ class core extends common
 			$right .= '<li><a href="' . helper::baseUrl() . 'manager" title="' . helper::translate('Gérer les fichiers') . '">' . template::ico('folder') . '</a></li>';
 			$right .= '<li><a href="' . helper::baseUrl() . 'theme" title="' . helper::translate('Personnaliser le thème') . '">' . template::ico('palette') . '</a></li>';
 			$right .= '<li><a href="' . helper::baseUrl() . 'config" title="' . helper::translate('Configurer le site') . '">' . template::ico('gear') . '</a></li>';
-			$right .= '<li><a href="' . helper::baseUrl() . 'logout" data-remodal-target="modal" title="' . helper::translate('Se déconnecter') . '">' . template::ico('logout') . '</a></li>';
+			$right .= '<li><a href="' . helper::baseUrl() . 'logout/' . $this->getUrl(null, false) . '" data-remodal-target="modal" title="' . helper::translate('Se déconnecter') . '">' . template::ico('logout') . '</a></li>';
 			// Retourne le panneau
 			return '<div id="panel"><div class="container"><ul class="left">' . $left . '</ul><ul class="right">' . $right . '</ul></div></div>';
 		}
@@ -2212,8 +2212,14 @@ class core extends common
 	{
 		// Supprime le cookie de connexion
 		self::removeCookie('PASSWORD');
-		// Redirige vers la page d'accueil du site
-		helper::redirect('./', false);
+		// Si l'URL correspond à une page redirige vers cette page
+		if($this->getData(['page', $this->getUrl(0)])) {
+			helper::redirect($this->getUrl(0));
+		}
+		// Sinon redirige vers la page d'accueil du site
+		else {
+			helper::redirect('./', false);
+		}
 	}
 
 	/** Gestionnaire de fichiers */
