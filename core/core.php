@@ -93,7 +93,7 @@ class common
 		'delete',
 		// 'edit', faux module système
 		'export',
-		// 'login', faux module système
+		'login',
 		'logout',
 		'manager',
 		'mode',
@@ -365,7 +365,7 @@ class common
 	 * @param  null|string $name Nom du cookie
 	 * @return string
 	 */
-	public function getCookie($name)
+	public static function getCookie($name)
 	{
 		return isset($_COOKIE[$name]) ? $_COOKIE[$name] : '';
 	}
@@ -446,15 +446,6 @@ class common
 	}
 
 	/**
-	 * Accède au mode d'affichage
-	 * @return string
-	 */
-	public function getMode()
-	{
-		return !empty($_SESSION['MODE']);
-	}
-
-	/**
 	 * Accède à la notification et supprime les sessions rattachées
 	 * @return array
 	 */
@@ -499,7 +490,6 @@ class common
 			// Retourne l'URL filtrée
 			return empty($url[$key]) ? '' : helper::filter($url[$key], helper::URL);
 		}
-
 	}
 
 	/**
@@ -507,9 +497,10 @@ class common
 	 * @param  null|string $name Nom du cookie
 	 * @return string
 	 */
-	public function removeCookie($name)
+	public static function removeCookie($name)
 	{
-		setcookie($name);
+		unset($_COOKIE[$name]);
+		setcookie($name, '', time() - 3600);
 	}
 
 	/**
@@ -573,11 +564,11 @@ class common
 	 * Insert un cookie
 	 * @param null|string $name    Nom du cookie
 	 * @param string      $content Mot de passe
-	 * @param int         $time    Temps de vie du cookie
+	 * @param bool        $oneYear 1 an de durée de vie sinon ne vie qu'une session
 	 */
-	public function setCookie($name, $content, $time)
+	public static function setCookie($name, $content, $oneYear = false)
 	{
-		setcookie($name, $content, $time);
+		setcookie($name, $content, $oneYear ? strtotime("+1 year") : 0);
 	}
 
 	/**
@@ -607,15 +598,6 @@ class common
 					break;
 			}
 		}
-	}
-
-	/**
-	 * Modifie le mode d'affichage
-	 * @param bool $mode True pour activer le mode édition ou false pour le désactiver
-	 */
-	public function setMode($mode)
-	{
-		$_SESSION['MODE'] = $mode;
 	}
 
 	/**
@@ -669,7 +651,7 @@ class core extends common
 	# SYSTEME
 
 	/**
-	 * Tâches à l'éxecution du coeur
+	 * Tâches à la construction du coeur :
 	 * - Suppression des fichiers temporaires trop vieux
 	 * - Définition de la version du CSS
 	 * - Génération du cache CSS si besoin
@@ -862,14 +844,14 @@ class core extends common
 	{
 		// Module système
 		if(in_array($this->getUrl(0, false), self::$system)) {
-			// Si l'utilisateur est connecté le module système est retournée (sauf pour le plan du site)
-			if($this->getUrl(0, false) === 'sitemap' OR $this->getData(['config', 'password']) === $this->getCookie('PASSWORD')) {
+			// Si l'utilisateur est connecté le module système est retournée (sauf pour le plan du site et pour la connexion)
+			if(in_array($this->getUrl(0, false), ['login', 'sitemap']) OR $this->getData(['config', 'password']) === self::getCookie('PASSWORD')) {
 				$method = $this->getUrl(0, false);
 				$this->$method();
 			}
 			// Sinon il doit s'identifier
 			else {
-				$this->login();
+				helper::redirect('login/' . $this->getUrl(null, false));
 			}
 		}
 		// Module système d'édition si :
@@ -877,8 +859,8 @@ class core extends common
 		// - Le mode édition est activé
 		// - Une page est demandée
 		elseif(
-			$this->getData(['config', 'password']) === $this->getCookie('PASSWORD')
-			AND $this->getMode()
+			$this->getData(['config', 'password']) === self::getCookie('PASSWORD')
+			AND self::getCookie('MODE')
 			AND $page = $this->getData(['page', $this->getUrl(0, false)])
 		) {
 			$this->edit();
@@ -886,7 +868,7 @@ class core extends common
 		// Page et module de page
 		elseif($this->getData(['page', $this->getUrl(0, false)])) {
 			// Utilisateur non connecté et layout LAYOUT utilisé
-			if(!$this->getCookie('PASSWORD') AND self::$layout === 'LAYOUT') {
+			if(!self::getCookie('PASSWORD') AND self::$layout === 'LAYOUT') {
 				// Remplace les / de l'URL par des _
 				$url = str_replace('/', '_', $this->getUrl());
 				// Importe le fichier si il existe
@@ -964,7 +946,7 @@ class core extends common
 		if(
 			$this->getData(['page', $this->getUrl(0)])
 			AND self::$cache
-			AND !$this->getCookie('PASSWORD')
+			AND !self::getCookie('PASSWORD')
 			AND !file_exists('core/cache/' . $url . '.html')
 			AND self::$layout === 'LAYOUT'
 		) {
@@ -1006,7 +988,7 @@ class core extends common
 	{
 		// Affiche ou non le titre
 		$title = '';
-		if($this->getMode() OR !$this->getData(['page', $this->getUrl(0, false)]) OR !$this->getData(['page', $this->getUrl(0, false), 'hideTitle'])) {
+		if(self::getCookie('MODE') OR !$this->getData(['page', $this->getUrl(0, false)]) OR !$this->getData(['page', $this->getUrl(0, false), 'hideTitle'])) {
 			$title = '<h2>' . self::$title . '</h2>';
 		}
 		// Retourne le contenu de la page
@@ -1027,6 +1009,70 @@ class core extends common
 	{
 		if($favicon = $this->getData(['config', 'favicon'])) {
 			return '<link rel="shortcut icon" href="' . helper::baseUrl(false) . $favicon . '">';
+		}
+	}
+
+	/**
+	 * Affiche les liens en bas du site
+	 * @return string
+	 */
+	public function showFooterLinks()
+	{
+		$login = '';
+		if($this->getData(['config', 'password']) !== self::getCookie('PASSWORD')) {
+			$login = ' | ' . template::a(helper::baseUrl() . 'login/' . $this->getUrl(null, false), 'Connexion');
+		}
+		return
+			helper::translate('Motorisé par').
+			' '.
+			template::a('http://zwiicms.com/', 'ZwiiCMS', [
+				'target' => '_blank'
+			]).
+			' | '.
+			template::a(helper::baseUrl() . 'sitemap', 'Plan du site', [
+				'target' => '_blank'
+			]).
+			$login;
+	}
+
+	/**
+	 * Affiche les réseaux sociaux dans le bas de page
+	 * @return string
+	 */
+	public function showFooterSocials()
+	{
+		$socials = '';
+		foreach($this->getData(['config', 'social']) as $socialName => $socialId) {
+			// URL en fonction de réseau social
+			switch($socialName) {
+				case 'facebook':
+					$socialUrl = 'https://www.facebook.com/';
+					break;
+				case 'googleplus':
+					$socialUrl = 'https://plus.google.com/';
+					break;
+				case 'instagram':
+					$socialUrl = 'https://www.instagram.com/';
+					break;
+				case 'pinterest':
+					$socialUrl = 'https://pinterest.com/';
+					break;
+				case 'twitter':
+					$socialUrl = 'https://twitter.com/';
+					break;
+				case 'youtube':
+					$socialUrl = 'https://www.youtube.com/channel/';
+					break;
+				default:
+					$socialUrl = '';
+			}
+			if(!empty($socialId)) {
+				$socials .= '<a href="' . $socialUrl . $socialId . '" target="_blank">' . template::ico($socialName) . '</a>';
+			}
+		}
+		// Retourne les réseaux sociaux
+		if(!empty($socials)) {
+			return '<div id="socials">' . $socials . '</div>';
 		}
 	}
 
@@ -1066,7 +1112,7 @@ class core extends common
 			if($parentKey === $this->getUrl(0) OR in_array($this->getUrl(0), $childrenKeys)) {
 				$current = ' class="current"';
 			}
-			$blank = ($this->getData(['page', $parentKey, 'blank']) AND !$this->getMode()) ? ' target="_blank"' : '';
+			$blank = ($this->getData(['page', $parentKey, 'blank']) AND !self::getCookie('MODE')) ? ' target="_blank"' : '';
 			// Mise en page de l'item
 			$items .= '<li>';
 			$items .= '<a href="' . helper::baseUrl() . $parentKey . '"' . $current . $blank . '>' . $this->getData(['page', $parentKey, 'title']) . '</a>';
@@ -1074,7 +1120,7 @@ class core extends common
 			foreach($childrenKeys as $childKey) {
 				// Propriétés de l'item
 				$current = ($childKey === $this->getUrl(0)) ? ' class="current"' : '';
-				$blank = ($this->getData(['page', $childKey, 'blank']) AND !$this->getMode()) ? ' target="_blank"' : '';
+				$blank = ($this->getData(['page', $childKey, 'blank']) AND !self::getCookie('MODE')) ? ' target="_blank"' : '';
 				// Mise en page du sous-item
 				$items .= '<li><a href="' . helper::baseUrl() . $childKey . '"' . $current . $blank . '>' . $this->getData(['page', $childKey, 'title']) . '</a></li>';
 			}
@@ -1135,7 +1181,7 @@ class core extends common
 	public function showPanel()
 	{
 		// Crée le panneau seulement si l'utilisateur est connecté
-		if($this->getCookie('PASSWORD') === $this->getData(['config', 'password'])) {
+		if(self::getCookie('PASSWORD') === $this->getData(['config', 'password'])) {
 			// Items de gauche
 			$left = '<li><select onchange="$(location).attr(\'href\', $(this).val());">';
 			// Affiche l'option "Choisissez une page" seulement pour le module de configuration et le gestionnaire de fichier
@@ -1151,54 +1197,13 @@ class core extends common
 			$left .= '</select></li>';
 			// Items de droite
 			$right = '<li><a href="' . helper::baseUrl() . 'create" title="' . helper::translate('Créer une page') . '">' . template::ico('plus') . '</a></li>';
-			$right .= '<li><a href="' . helper::baseUrl() . 'mode/' . $this->getUrl(null, false) . '"' . ($this->getMode() ? ' class="edit"' : '') . ' title="' . helper::translate('Activer/Désactiver le mode édition') . '">' . template::ico('pencil') . '</a></li>';
+			$right .= '<li><a href="' . helper::baseUrl() . 'mode/' . $this->getUrl(null, false) . '"' . (self::getCookie('MODE') ? ' class="edit"' : '') . ' title="' . helper::translate('Activer/Désactiver le mode édition') . '">' . template::ico('pencil') . '</a></li>';
 			$right .= '<li><a href="' . helper::baseUrl() . 'manager" title="' . helper::translate('Gérer les fichiers') . '">' . template::ico('folder') . '</a></li>';
 			$right .= '<li><a href="' . helper::baseUrl() . 'theme" title="' . helper::translate('Personnaliser le thème') . '">' . template::ico('palette') . '</a></li>';
 			$right .= '<li><a href="' . helper::baseUrl() . 'config" title="' . helper::translate('Configurer le site') . '">' . template::ico('gear') . '</a></li>';
 			$right .= '<li><a href="' . helper::baseUrl() . 'logout" data-remodal-target="modal" title="' . helper::translate('Se déconnecter') . '">' . template::ico('logout') . '</a></li>';
 			// Retourne le panneau
 			return '<div id="panel"><div class="container"><ul class="left">' . $left . '</ul><ul class="right">' . $right . '</ul></div></div>';
-		}
-	}
-
-	/**
-	 * Affiche les réseaux sociaux
-	 * @return string
-	 */
-	public function showSocials()
-	{
-		$socials = '';
-		foreach($this->getData(['config', 'social']) as $socialName => $socialId) {
-			// URL en fonction de réseau social
-			switch($socialName) {
-				case 'facebook':
-					$socialUrl = 'https://www.facebook.com/';
-					break;
-				case 'googleplus':
-					$socialUrl = 'https://plus.google.com/';
-					break;
-				case 'instagram':
-					$socialUrl = 'https://www.instagram.com/';
-					break;
-				case 'pinterest':
-					$socialUrl = 'https://pinterest.com/';
-					break;
-				case 'twitter':
-					$socialUrl = 'https://twitter.com/';
-					break;
-				case 'youtube':
-					$socialUrl = 'https://www.youtube.com/channel/';
-					break;
-				default:
-					$socialUrl = '';
-			}
-			if(!empty($socialId)) {
-				$socials .= '<a href="' . $socialUrl . $socialId . '" target="_blank">' . template::ico($socialName) . '</a>';
-			}
-		}
-		// Retourne les réseaux sociaux
-		if(!empty($socials)) {
-			return '<div id="socials">' . $socials . '</div>';
 		}
 	}
 
@@ -1261,8 +1266,7 @@ class core extends common
 		if($this->getData(['config', 'cookieConsent'])) {
 			$end .= '
 				// Message sur l\'utilisation des cookies
-				var name = "CONSENT";
-				if(document.cookie.indexOf(name) === -1) {
+				if(document.cookie.indexOf("CONSENT") === -1) {
 					$("body").append(
 						$("<div>").attr("id", "cookieConsentMessage").append(
 							$("<span>").text("' . helper::translate('En poursuivant votre navigation sur ce site, vous acceptez l\'utilisation de cookies.') . '"),
@@ -1273,9 +1277,7 @@ class core extends common
 									// Créé le cookie d\'acceptation
 									var expires = new Date();
 									expires.setFullYear(expires.getFullYear() + 1);
-									expires = "expires=" + expires.toUTCString();
-									var value = "true";
-									document.cookie = name + "=" + value + ";" + expires;
+									document.cookie = "CONSENT=true;expires=" + expires.toUTCString();
 									// Ferme le message
 									$(this).parents("#cookieConsentMessage").fadeOut();
 								})
@@ -2152,22 +2154,33 @@ class core extends common
 		self::$layout = 'BLANK';
 	}
 
-	/** Connexion (faux module système) */
+	/** Connexion */
 	public function login()
 	{
+		// Erreur 404
+		if($this->getData(['config', 'password']) === self::getCookie('PASSWORD')) {
+			return false;
+		}
 		// Traitement du formulaire
-		if($this->getPost('submit')) {
+		elseif($this->getPost('submit')) {
 			// Crée un cookie (de durée infinie si la case est cochée) si le mot de passe est correct
 			if($this->getPost('password', helper::PASSWORD) === $this->getData(['config', 'password'])) {
-				$time = $this->getPost('time') ? 0 : time() + 10 * 365 * 24 * 60 * 60;
-				$this->setCookie('PASSWORD', $this->getPost('password', helper::PASSWORD), $time);
+				self::setCookie('PASSWORD', $this->getPost('password', helper::PASSWORD), $this->getPost('time'));
 			}
 			// Notification d'échec si le mot de passe incorrect
 			else {
 				$this->setNotification('Mot de passe incorrect !', true);
 			}
-			// Redirection vers l'URL courante
-			helper::redirect($this->getUrl(null, false));
+			// Passe en mode édition
+			self::setCookie('MODE', true);
+			// Redirection vers l'URL de la page précédente
+			if($this->getUrl(0)) {
+				helper::redirect($this->getUrl());
+			}
+			// Redirection vers la page d'accueil
+			else {
+				helper::redirect('./', false);
+			}
 		}
 		// Contenu de la page
 		self::$title = helper::translate('Connexion');
@@ -2197,7 +2210,7 @@ class core extends common
 	public function logout()
 	{
 		// Supprime le cookie de connexion
-		$this->removeCookie('PASSWORD');
+		self::removeCookie('PASSWORD');
 		// Redirige vers la page d'accueil du site
 		helper::redirect('./', false);
 	}
@@ -2286,7 +2299,7 @@ class core extends common
 	public function mode()
 	{
 		// Switch de mode
-		$this->setMode(!$this->getMode());
+		self::setCookie('MODE', !self::getCookie('MODE'));
 		// Redirection spécifique pour le module système "module" pour pointer vers la page
 		if($this->getUrl(0) === 'module') {
 			helper::redirect($this->getUrl(1));
@@ -3669,7 +3682,8 @@ class template
 			'data-2' => '',
 			'data-3' => '',
 			'style' => '',
-			'title' => ''
+			'title' => '',
+			'target' => ''
 		], $attributes);
 		// Retourne le html
 		return sprintf(
