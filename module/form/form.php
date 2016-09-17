@@ -311,25 +311,21 @@ class formAdm extends common
 						}
 					'),
 				'Configuration' =>
-					template::block([
-						'col' => 0,
-						'text' =>
-							template::openRow().
-							template::text('mail', [
-								'label' => 'Adresse mail pour recevoir les données saisies à chaque soumission du formulaire',
-								'value' => $this->getData([$this->getUrl(0), 'config', 'mail'])
-							]).
-							template::newRow().
-							template::text('button', [
-								'label' => 'Texte du bouton de soumission',
-								'value' => $this->getData([$this->getUrl(0), 'config', 'button'])
-							]).
-							template::newRow().
-							template::checkbox('capcha', true, 'Ajouter un capcha à remplir pour soumettre le formulaire', [
-								'checked' => $this->getData([$this->getUrl(0), 'config', 'capcha'])
-							]).
-							template::closeRow()
-				]),
+					template::openRow().
+					template::text('mail', [
+						'label' => 'Adresse mail pour recevoir les données saisies à chaque soumission du formulaire',
+						'value' => $this->getData([$this->getUrl(0), 'config', 'mail'])
+					]).
+					template::newRow().
+					template::text('button', [
+						'label' => 'Texte du bouton de soumission',
+						'value' => $this->getData([$this->getUrl(0), 'config', 'button'])
+					]).
+					template::newRow().
+					template::checkbox('capcha', true, 'Ajouter un capcha à remplir pour soumettre le formulaire', [
+						'checked' => $this->getData([$this->getUrl(0), 'config', 'capcha'])
+					]).
+					template::closeRow(),
 				'Données enregistrées' =>
 					(isset($data) ? $data : template::subTitle('Aucune donnée...'))
 			]).
@@ -467,17 +463,14 @@ class formMod extends common
 					template::closeRow();
 			}
 			// Assemble les éléments
-			self::$content = template::block([
-				'col' => 0,
-				'text' =>
-					$html.
-					template::openRow().
-					template::submit('submit', [
-						'value' => $this->getData([$this->getUrl(0), 'config', 'button']) ? $this->getData([$this->getUrl(0), 'config', 'button']) : 'Enregistrer',
-						'col' => 2
-					]).
-					template::closeRow()
-			]);
+			self::$content =
+				$html.
+				template::openRow().
+				template::submit('submit', [
+					'value' => $this->getData([$this->getUrl(0), 'config', 'button']) ? $this->getData([$this->getUrl(0), 'config', 'button']) : 'Enregistrer',
+					'col' => 2
+				]).
+				template::closeRow();
 		}
 		// Contenu de la page
 		self::$content =

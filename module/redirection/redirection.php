@@ -35,16 +35,11 @@ class redirectionAdm extends common
 		self::$content =
 			template::openForm().
 			template::openRow().
-			template::block([
-				'text' =>
-					template::openRow().
-					template::text('url', [
-						'label' => 'Lien de redirection',
-						'value' => $this->getData([$this->getUrl(0), 'url']),
-						'required' => true,
-						'placeholder' => 'http://'
-					]).
-					template::closeRow()
+			template::text('url', [
+				'label' => 'Lien de redirection',
+				'value' => $this->getData([$this->getUrl(0), 'url']),
+				'required' => true,
+				'placeholder' => 'http://'
 			]).
 			template::newRow().
 			template::button('back', [

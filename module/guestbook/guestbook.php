@@ -151,36 +151,34 @@ class guestbookMod extends common
 		// Ajoute la liste des pages en dessous des commentaires
 		self::$content =
 			(self::$content ? self::$content : template::subTitle('Aucun commentaire...')).
+			template::title('Ajouter un commentaire').
 			template::openForm().
-			template::block([
-				'col' => 0,
-				'title' => 'Ajouter un commentaire',
-				'text' =>
-					template::openRow().
-					template::text('name', [
-						'label' => 'Nom',
-						'required' => true,
-						'col' => 6
-					]).
-					template::text('mail', [
-						'label' => 'Adresse mail (facultatif)',
-						'col' => 6
-					]).
-					template::newRow().
-					template::textarea('comment', [
-						'label' => 'Commentaire'
-					]).
-					template::newRow().
-					template::capcha('capcha', [
-						'col' => 3
-					]).
-					template::submit('submit', [
-						'value' => 'Ajouter',
-						'col' => 2,
-						'offset' => 7,
-					]).
-					template::closeRow()
+			template::openRow().
+			template::text('name', [
+				'label' => 'Nom',
+				'required' => true,
+				'col' => 6
 			]).
+			template::newRow().
+			template::text('mail', [
+				'label' => 'Adresse mail (facultatif)',
+				'col' => 6
+			]).
+			template::newRow().
+			template::textarea('comment', [
+				'label' => 'Commentaire',
+				'col' => 8
+			]).
+			template::newRow().
+			template::capcha('capcha', [
+				'col' => 3
+			]).
+			template::newRow().
+			template::submit('submit', [
+				'value' => 'Ajouter',
+				'col' => 2
+			]).
+			template::closeRow().
 			template::closeForm();
 	}
 }

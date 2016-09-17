@@ -524,10 +524,9 @@ label {
 /* Bloc */
 .blockWrapper {
 	vertical-align: top !important;
-	margin: 10px 0;
 }
-.row .blockWrapper {
-	margin: 0;
+.blockWrapper.col0 {
+	margin: 20px 0;
 }
 .block {
 	border: 1px solid #DDD;

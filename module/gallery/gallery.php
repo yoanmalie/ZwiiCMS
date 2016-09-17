@@ -84,28 +84,25 @@ class galleryAdm extends common
 			template::openForm('upload', [
 				'enctype' => 'multipart/form-data'
 			]).
-			template::block([
-				'col' => 0,
-				'title' => 'Envoyer une image',
-				'text' =>
-					template::openRow().
-					template::file('file', [
-						'label' => 'Parcourir mes fichiers',
-						'help' => helper::translate('Les formats de fichiers autorisés sont :') . ' ' . implode(', .', self::$galleryExtensions) . '.',
-						'col' => '4'
-					]).
-					template::text('legend', [
-						'label' => 'Légende de l\'image',
-						'col' => '6',
-						'required' => true
-					]).
-					template::submit('send', [
-						'value' => 'Envoyer',
-						'col' => '2'
-					]).
-					template::closeRow()
+			template::title('Envoyer une image').
+			template::openRow().
+			template::file('file', [
+				'label' => 'Parcourir mes fichiers',
+				'help' => helper::translate('Les formats de fichiers autorisés sont :') . ' ' . implode(', .', self::$galleryExtensions) . '.',
+				'col' => '4'
 			]).
+			template::text('legend', [
+				'label' => 'Légende de l\'image',
+				'col' => '6',
+				'required' => true
+			]).
+			template::submit('send', [
+				'value' => 'Envoyer',
+				'col' => '2'
+			]).
+			template::closeRow().
 			template::closeForm().
+			template::title('Liste des images').
 			(self::$content ? self::$content : template::subTitle('Aucune image...')).
 			template::openRow().
 			template::button('back', [

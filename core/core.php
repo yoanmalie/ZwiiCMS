@@ -1566,8 +1566,8 @@ class core extends common
 						'col' => 6,
 						'class' => 'verticalAlignTop',
 						'text' =>
-							template::openRow().
 							template::block([
+								'col' => 0,
 								'title' => 'Site',
 								'text' =>
 									template::openRow().
@@ -1588,6 +1588,7 @@ class core extends common
 									template::closeRow()
 							]).
 							template::block([
+								'col' => 0,
 								'title' => 'Statistiques',
 								'text' =>
 									template::openRow().
@@ -1598,15 +1599,14 @@ class core extends common
 										'placeholder' => 'UA-XXXXXXXX-X',
 									]).
 									template::closeRow()
-							]).
-							template::closeRow()
+							])
 					]).
 					template::div([
 						'col' => 6,
 						'class' => 'verticalAlignTop',
 						'text' =>
-							template::openRow().
 							template::block([
+								'col' => 0,
 								'title' => 'Réseaux sociaux',
 								'text' =>
 									template::openRow().
@@ -1650,6 +1650,7 @@ class core extends common
 									template::closeRow()
 							]).
 							template::block([
+								'col' => 0,
 								'title' => 'Système',
 								'text' =>
 									template::openRow().
@@ -1684,8 +1685,7 @@ class core extends common
 										'disabled' => !helper::modRewriteCheck() // Check que l'URL rewriting fonctionne sur le serveur
 									]).
 									template::closeRow()
-							]).
-							template::closeRow()
+							])
 					]).
 					template::closeRow()
 			]).
@@ -2282,23 +2282,20 @@ class core extends common
 			template::openForm('form', [
 				'enctype' => 'multipart/form-data'
 			]).
-			template::block([
-				'col' => 0,
-				'title' => 'Envoyer un fichier',
-				'text' =>
-					template::openRow().
-					template::file('file', [
-						'label' => 'Parcourir mes fichiers',
-						'help' => helper::translate('Les formats de fichiers autorisés sont :') . ' ' . implode(', .', self::$managerExtensions) . '.',
-						'col' => 10
-					]).
-					template::submit('submit', [
-						'value' => 'Envoyer',
-						'col' => 2
-					]).
-					template::closeRow()
+			template::title('Envoyer un fichier').
+			template::openRow().
+			template::file('file', [
+				'label' => 'Parcourir mes fichiers',
+				'help' => helper::translate('Les formats de fichiers autorisés sont :') . ' ' . implode(', .', self::$managerExtensions) . '.',
+				'col' => 10
 			]).
+			template::submit('submit', [
+				'value' => 'Envoyer',
+				'col' => 2
+			]).
+			template::closeRow().
 			template::closeForm().
+			template::title('Liste des fichiers').
 			(self::$content ? self::$content : template::subTitle('Aucun fichier...'));
 	}
 
