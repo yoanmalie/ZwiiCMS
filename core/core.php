@@ -2172,8 +2172,6 @@ class core extends common
 			else {
 				$this->setNotification('Mot de passe incorrect !', true);
 			}
-			// Passe en mode édition
-			self::setCookie('MODE', true);
 			// Redirection vers l'URL de la page précédente
 			if($this->getUrl(0)) {
 				helper::redirect($this->getUrl());
